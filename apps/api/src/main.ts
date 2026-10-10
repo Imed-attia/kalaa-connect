@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { StructuredLoggingInterceptor } from './common/interceptors/logging.interceptor';
 import * as dotenv from 'dotenv';
@@ -14,10 +15,18 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
+  // Sécurité : En-têtes HTTP sécurisés via Helmet
+  app.use(
+    helmet({
+      contentSecurityPolicy: false, // Permet le rendu de Swagger UI et l'intégration cartographique OSM
+      crossOriginEmbedderPolicy: false,
+    }),
+  );
+
   // Préfixe global
   app.setGlobalPrefix('api');
 
-  // CORS
+  // CORS sécurisé
   app.enableCors({
     origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
