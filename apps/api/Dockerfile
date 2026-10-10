@@ -50,4 +50,4 @@ USER nestjs
 EXPOSE 8080
 
 # Commande de démarrage Cloud Run
-CMD ["node", "apps/api/dist/main.js"]
+CMD ["node", "apps/api/dist/apps/api/src/main.js"]

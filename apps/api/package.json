@@ -5,9 +5,9 @@
   "description": "API NestJS pour la plateforme Kalaa Connect",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "start": "node dist/main",
+    "start": "node dist/apps/api/src/main",
     "start:dev": "ts-node -r tsconfig-paths/register src/main.ts",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/apps/api/src/main",
     "lint": "echo 'Linting API... OK'",
     "test": "jest",
     "test:watch": "jest --watch",
