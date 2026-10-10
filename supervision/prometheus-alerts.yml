@@ -1,0 +1,35 @@
+groups:
+  - name: kalaa_connect_alerts
+    rules:
+      # Alerte 1 : Taux d'erreurs HTTP 5xx élevé (> 5% sur 5 minutes)
+      - alert: KalaaApiHighErrorRate
+        expr: (sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))) * 100 > 5
+        for: 2m
+        labels:
+          severity: critical
+          service: kalaa-connect-api
+        annotations:
+          summary: "Taux d'erreur élevé sur l'API Kalaa Connect (> 5%)"
+          description: "Plus de 5% des requêtes vers l'API renvoient une erreur HTTP 5xx."
+
+      # Alerte 2 : Latence excessive (p95 > 1000ms sur 5 minutes)
+      - alert: KalaaApiHighLatency
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1.0
+        for: 3m
+        labels:
+          severity: warning
+          service: kalaa-connect-api
+        annotations:
+          summary: "Latence élevée détectée sur l'API (> 1 seconde au 95ème centile)"
+          description: "Le temps de réponse p95 dépasse 1000 ms."
+
+      # Alerte 3 : Indisponibilité du service (Downtime / Absence de métriques pendant 2 minutes)
+      - alert: KalaaApiServiceDown
+        expr: up{job="kalaa-connect-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: kalaa-connect-api
+        annotations:
+          summary: "Service Kalaa Connect API indisponible"
+          description: "Le endpoint /health ne répond plus depuis plus d'une minute."

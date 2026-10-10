@@ -1,0 +1,54 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "title": "Kalaa Connect — Supervision & Performance Municipale",
+  "tags": ["kalaa-connect", "municipalite", "cloud-run"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "panels": [
+    {
+      "title": "Requêtes par seconde (RPS)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "rate(http_requests_total[1m])", "legendFormat": "{{status}}" }
+      ]
+    },
+    {
+      "title": "Latence p95 (secondes)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[1m])) by (le))", "legendFormat": "p95" }
+      ]
+    },
+    {
+      "title": "Signalements Urbains Enregistrés",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 8 },
+      "targets": [
+        { "expr": "kalaa_reports_total", "legendFormat": "Total Tickets" }
+      ]
+    },
+    {
+      "title": "Mémoire Heap Utilisée (Mo)",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 8 },
+      "targets": [
+        { "expr": "kalaa_memory_heap_bytes / 1024 / 1024", "legendFormat": "Heap MB" }
+      ]
+    },
+    {
+      "title": "Disponibilité Uptime (Secondes)",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 8 },
+      "targets": [
+        { "expr": "kalaa_api_uptime_seconds", "legendFormat": "Uptime" }
+      ]
+    }
+  ]
+}

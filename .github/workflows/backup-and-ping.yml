@@ -1,0 +1,31 @@
+name: Cron - Sauvegarde SQL & Maintien Actif Supabase
+
+on:
+  schedule:
+    # Exécution tous les 3 jours à 04h00 UTC pour éviter la mise en veille gratuite Supabase (inactivité > 7 jours)
+    - cron: '0 4 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  ping-and-backup:
+    name: Ping Anti-Pause & Sauvegarde Base de Données
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du dépôt
+        uses: actions/checkout@v4
+
+      - name: Envoi d'une requête Keep-Alive vers l'API et la base
+        run: |
+          API_URL="${{ secrets.API_PRODUCTION_URL || 'https://kalaa-connect-api.run.app' }}"
+          echo "Ping de santé vers : $API_URL/health"
+          curl -s -f "$API_URL/health" || echo "API en sommeil, réveil initié"
+
+      - name: Sauvegarde PostgreSQL planifiée (si DATABASE_URL configurée)
+        if: env.DATABASE_URL != ''
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          mkdir -p backups
+          pg_dump "${{ secrets.DATABASE_URL }}" > "backups/kalaa_backup_${TIMESTAMP}.sql"
+          echo "Sauvegarde générée avec succès : backups/kalaa_backup_${TIMESTAMP}.sql"

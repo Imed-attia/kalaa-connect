@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # Base de données PostgreSQL locale (alternative locale à Supabase)
+  postgres:
+    image: postgres:15-alpine
+    container_name: kalaa-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: kalaa_connect
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./apps/api/src/database/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # API NestJS
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: kalaa-api
+    restart: always
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      DATABASE_MODE: mock
+      EMAIL_PROVIDER: mock
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Application Web React PWA
+  web:
+    image: node:20-alpine
+    container_name: kalaa-web
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: npm run dev --workspace=apps/web -- --host
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+
+  # Serveur de capture d'emails local (Inbucket)
+  maildev:
+    image: inbucket/inbucket:latest
+    container_name: kalaa-inbucket
+    ports:
+      - "9000:9000" # Interface Web pour visualiser les emails de test
+      - "2500:2500" # Port SMTP
+
+volumes:
+  pgdata:

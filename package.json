@@ -1,0 +1,31 @@
+{
+  "name": "kalaa-connect",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plateforme cloud de signalement citoyen pour la municipalité de Kalaa Soghra",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "start:api": "npm run start:dev --workspace=apps/api",
+    "start:web": "npm run dev --workspace=apps/web",
+    "test:api": "npm run test --workspace=apps/api",
+    "test:web": "npm run test --workspace=apps/web"
+  },
+  "keywords": [
+    "kalaa-soghra",
+    "smart-city",
+    "pwa",
+    "nestjs",
+    "react",
+    "supabase",
+    "leaflet",
+    "gemini-ai"
+  ],
+  "author": "Imed Attia <imedattia1032@gmail.com>",
+  "license": "MIT"
+}
