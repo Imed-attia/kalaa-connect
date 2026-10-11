@@ -30,6 +30,7 @@ jobs:
       - name: Installation et tests
         run: |
           npm ci
+          npm run build --workspace=packages/shared
           npm run test
 
       - name: Build de l'image Docker locale pour audit
@@ -45,9 +46,10 @@ jobs:
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
 
-  # 2. Déploiement du Frontend sur Cloudflare Pages
+  # 2. Déploiement du Frontend sur Cloudflare Pages (Optionnel si secrets configurés)
   deploy-frontend:
     name: Déploiement Web sur Cloudflare Pages
+    if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
     needs: security-and-test
     runs-on: ubuntu-latest
     steps:
@@ -73,9 +75,10 @@ jobs:
           projectName: 'kalaa-connect'
           directory: 'apps/web/dist'
 
-  # 3. Déploiement de l'API sur Google Cloud Run
+  # 3. Déploiement de l'API sur Google Cloud Run (Optionnel si secrets configurés)
   deploy-api-cloud-run:
     name: Déploiement API sur Cloud Run
+    if: ${{ secrets.GCP_SA_KEY != '' }}
     needs: security-and-test
     runs-on: ubuntu-latest
     steps:

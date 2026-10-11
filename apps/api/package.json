@@ -57,6 +57,9 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@kalaa-connect/shared$": "<rootDir>/../../../packages/shared/dist/index.js"
+    }
   }
 }

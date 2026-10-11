@@ -9,12 +9,12 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces",
-    "test": "npm run test --workspaces",
+    "test": "npm run build --workspace=packages/shared && npm run test --workspaces",
     "lint": "npm run lint --workspaces",
     "start:api": "npm run start:dev --workspace=apps/api",
     "start:web": "npm run dev --workspace=apps/web",
-    "test:api": "npm run test --workspace=apps/api",
-    "test:web": "npm run test --workspace=apps/web"
+    "test:api": "npm run build --workspace=packages/shared && npm run test --workspace=apps/api",
+    "test:web": "npm run build --workspace=packages/shared && npm run test --workspace=apps/web"
   },
   "keywords": [
     "kalaa-soghra",
