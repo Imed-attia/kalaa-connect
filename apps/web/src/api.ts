@@ -37,7 +37,9 @@ export const apiClient = {
       const res = await fetch(`${API_BASE}/reports?${query}`);
       if (res.ok) {
         const data = await res.json();
-        return data.data || [];
+        const list = data.data || [];
+        localStorage.setItem('kalaa_reports_cache', JSON.stringify(list));
+        return list;
       }
     } catch {
       // repli
@@ -80,6 +82,44 @@ export const apiClient = {
       localStorage.setItem('kalaa_offline_drafts', JSON.stringify(drafts));
       return offlineReport;
     }
+  },
+
+  async updateReport(
+    id: string,
+    updateData: any,
+    token = 'test-token-citoyen',
+  ): Promise<Report> {
+    const res = await fetch(`${API_BASE}/reports/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'Erreur lors de la mise à jour du signalement');
+    }
+
+    return await res.json();
+  },
+
+  async deleteReport(id: string, token = 'test-token-admin'): Promise<boolean> {
+    const res = await fetch(`${API_BASE}/reports/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'Erreur lors de la suppression');
+    }
+
+    return true;
   },
 
   async updateReportStatus(

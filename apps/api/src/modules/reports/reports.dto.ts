@@ -126,3 +126,40 @@ export class FilterReportsDto {
   @IsOptional()
   limit?: number = 20;
 }
+
+export class UpdateReportDetailsDto {
+  @ApiPropertyOptional({ example: 'Nid-de-poule dangereux rue Ibn Khaldoun (Mise à jour)' })
+  @IsString()
+  @IsOptional()
+  titre?: string;
+
+  @ApiPropertyOptional({ example: 'Description actualisée de l’anomalie' })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @ApiPropertyOptional({ example: 'cat-nid-de-poule' })
+  @IsString()
+  @IsOptional()
+  categorie_id?: string;
+
+  @ApiPropertyOptional({ enum: ReportPriority })
+  @IsEnum(ReportPriority)
+  @IsOptional()
+  priorite?: ReportPriority;
+
+  @ApiPropertyOptional({ example: 'Centre-Ville' })
+  @IsString()
+  @IsOptional()
+  quartier?: string;
+
+  @ApiPropertyOptional({ example: 'Avenue Habib Bourguiba' })
+  @IsString()
+  @IsOptional()
+  adresse_approximative?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  photo_url?: string;
+}

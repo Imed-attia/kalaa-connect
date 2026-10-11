@@ -3,6 +3,8 @@ import {
   Post,
   Get,
   Patch,
+  Put,
+  Delete,
   Param,
   Body,
   Query,
@@ -13,6 +15,7 @@ import { ReportsService } from './reports.service';
 import {
   CreateReportDto,
   UpdateReportStatusDto,
+  UpdateReportDetailsDto,
   AddCommentDto,
   FilterReportsDto,
 } from './reports.dto';
@@ -83,5 +86,29 @@ export class ReportsController {
     @CurrentUser() user: User,
   ) {
     return this.reportsService.addComment(id, dto, user);
+  }
+
+  @Patch(':id')
+  @Put(':id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Modification des détails d’un signalement (titre, description, etc.)' })
+  async updateReport(
+    @Param('id') id: string,
+    @Body() dto: UpdateReportDetailsDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.reportsService.updateReport(id, dto, user);
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Suppression d’un signalement' })
+  async deleteReport(
+    @Param('id') id: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.reportsService.deleteReport(id, user);
   }
 }

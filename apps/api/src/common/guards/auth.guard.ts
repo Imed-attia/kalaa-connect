@@ -70,10 +70,10 @@ export class AuthGuard implements CanActivate {
     }
 
     // Utilisateur par défaut de test citoyen si jeton quelconque fourni en dev
-    request.user = this.db.users.get('usr-citoyen-imed') || {
-      id: 'usr-citoyen-imed',
-      nom: 'Imed Attia',
-      email: 'imedattia1032@gmail.com',
+    request.user = this.db.users.get('usr-citoyen-nada') || {
+      id: 'usr-citoyen-nada',
+      nom: 'Nada Slama',
+      email: 'nada.slama@esprit.tn',
       role: UserRole.CITOYEN,
       langue: AppLanguage.FR,
       cree_le: new Date().toISOString(),
@@ -83,17 +83,20 @@ export class AuthGuard implements CanActivate {
   }
 
   private resolveDevToken(token: string): User | undefined {
-    if (token === 'test-token-citoyen' || token === 'usr-citoyen-imed') {
+    if (token === 'test-token-citoyen' || token === 'usr-citoyen-nada') {
+      return this.db.users.get('usr-citoyen-nada');
+    }
+    if (token === 'usr-citoyen-imed') {
       return this.db.users.get('usr-citoyen-imed');
+    }
+    if (token === 'test-token-admin' || token === 'usr-admin-dalila') {
+      return this.db.users.get('usr-admin-dalila') || this.db.users.get('usr-admin-municipal');
     }
     if (token === 'test-token-agent' || token === 'usr-agent-voirie') {
       return this.db.users.get('usr-agent-voirie');
     }
     if (token === 'test-token-agent-proprete' || token === 'usr-agent-proprete') {
       return this.db.users.get('usr-agent-proprete');
-    }
-    if (token === 'test-token-admin' || token === 'usr-admin-municipal') {
-      return this.db.users.get('usr-admin-municipal');
     }
     return this.db.users.get(token);
   }

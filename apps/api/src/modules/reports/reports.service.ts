@@ -10,6 +10,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import {
   CreateReportDto,
   UpdateReportStatusDto,
+  UpdateReportDetailsDto,
   AddCommentDto,
   FilterReportsDto,
 } from './reports.dto';
@@ -101,6 +102,9 @@ export class ReportsService {
       date: now,
     };
     this.db.statusHistory.push(historyEntry);
+
+    // Persistance sur disque
+    this.db.persistToDisk();
 
     this.logger.log(`Nouveau signalement créé : ${ticketNumber} (${report.titre}) par ${user.nom}`);
 
@@ -238,6 +242,28 @@ export class ReportsService {
     };
     this.db.statusHistory.push(historyEntry);
 
+    // Synchronisation Supabase
+    const supabase = this.db.getSupabase();
+    if (supabase && this.db.mode === 'supabase') {
+      try {
+        await supabase
+          .from('signalements')
+          .update({
+            statut: dto.nouveau_statut,
+            mis_a_jour_le: report.mis_a_jour_le,
+            photo_preuve_url: report.photo_preuve_url,
+            motif_rejet_ou_doublon: report.motif_rejet_ou_doublon,
+            agent_id: report.agent_id,
+          })
+          .eq('id', id);
+      } catch (err: any) {
+        this.logger.warn(`Erreur mise à jour Supabase : ${err.message}`);
+      }
+    }
+
+    // Persistance sur disque
+    this.db.persistToDisk();
+
     this.logger.log(`Statut du ticket #${report.numero_ticket} modifié : ${previousStatus} -> ${dto.nouveau_statut}`);
 
     // Notification par email
@@ -246,6 +272,106 @@ export class ReportsService {
     }
 
     return report;
+  }
+
+  /**
+   * Modification des données d'un signalement existant (titre, description, priorité, etc.)
+   */
+  async updateReport(
+    id: string,
+    dto: UpdateReportDetailsDto,
+    user: User,
+  ): Promise<Report> {
+    const report = this.db.reports.get(id);
+    if (!report) {
+      throw new NotFoundException(`Signalement introuvable (${id})`);
+    }
+
+    if (dto.titre !== undefined) report.titre = dto.titre;
+    if (dto.description !== undefined) report.description = dto.description;
+    if (dto.priorite !== undefined) report.priorite = dto.priorite;
+    if (dto.adresse_approximative !== undefined) report.adresse_approximative = dto.adresse_approximative;
+    if (dto.quartier !== undefined) report.quartier = dto.quartier;
+    if (dto.photo_url !== undefined) report.photo_url = dto.photo_url;
+    if (dto.categorie_id !== undefined) {
+      report.categorie_id = dto.categorie_id;
+      const cat = this.db.categories.get(dto.categorie_id) || DEFAULT_CATEGORIES.find((c) => c.id === dto.categorie_id);
+      if (cat) {
+        report.categorie = cat;
+        report.service_id = cat.service_id;
+      }
+    }
+
+    report.mis_a_jour_le = new Date().toISOString();
+
+    // Mode Supabase
+    const supabase = this.db.getSupabase();
+    if (supabase && this.db.mode === 'supabase') {
+      try {
+        await supabase
+          .from('signalements')
+          .update({
+            titre: report.titre,
+            description: report.description,
+            priorite: report.priorite,
+            categorie_id: report.categorie_id,
+            quartier: report.quartier,
+            adresse_approximative: report.adresse_approximative,
+            photo_url: report.photo_url,
+            mis_a_jour_le: report.mis_a_jour_le,
+          })
+          .eq('id', id);
+      } catch (err: any) {
+        this.logger.warn(`Erreur mise à jour détails Supabase : ${err.message}`);
+      }
+    }
+
+    // Persistance sur disque
+    this.db.persistToDisk();
+
+    // Audit history
+    const historyEntry: StatusHistory = {
+      id: `hist-${Date.now()}`,
+      signalement_id: id,
+      ancien_statut: report.statut,
+      nouveau_statut: report.statut,
+      acteur_id: user.id,
+      acteur_nom: user.nom,
+      commentaire: 'Mise à jour des informations du signalement',
+      date: new Date().toISOString(),
+    };
+    this.db.statusHistory.push(historyEntry);
+
+    this.logger.log(`Signalement #${report.numero_ticket} mis à jour par ${user.nom}`);
+    return report;
+  }
+
+  /**
+   * Suppression d'un signalement
+   */
+  async deleteReport(id: string, user: User): Promise<{ success: boolean; id: string }> {
+    const report = this.db.reports.get(id);
+    if (!report) {
+      throw new NotFoundException(`Signalement introuvable (${id})`);
+    }
+
+    // Mode Supabase
+    const supabase = this.db.getSupabase();
+    if (supabase && this.db.mode === 'supabase') {
+      try {
+        await supabase.from('signalements').delete().eq('id', id);
+      } catch (err: any) {
+        this.logger.warn(`Erreur suppression Supabase : ${err.message}`);
+      }
+    }
+
+    this.db.reports.delete(id);
+    this.db.statusHistory = this.db.statusHistory.filter((h) => h.signalement_id !== id);
+    this.db.comments = this.db.comments.filter((c) => c.signalement_id !== id);
+
+    this.db.persistToDisk();
+    this.logger.log(`Signalement #${report.numero_ticket} (${id}) supprimé par ${user.nom}`);
+    return { success: true, id };
   }
 
   /**

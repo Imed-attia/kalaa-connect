@@ -1,5 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   DEFAULT_MUNICIPAL_SERVICES,
   DEFAULT_CATEGORIES,
@@ -18,14 +20,29 @@ export class DatabaseService implements OnModuleInit {
   private readonly logger = new Logger(DatabaseService.name);
   private supabase: SupabaseClient | null = null;
   public mode: 'supabase' | 'mock' = 'mock';
+  private storagePath: string;
 
-  // Tables mémoire locales pour le mode hors-ligne et les tests
+  // Tables mémoire locales avec persistance fichier
   public users: Map<string, User> = new Map();
   public services: Map<string, any> = new Map();
   public categories: Map<string, any> = new Map();
   public reports: Map<string, Report> = new Map();
   public statusHistory: StatusHistory[] = [];
   public comments: ReportComment[] = [];
+
+  constructor() {
+    const candidatePath1 = path.resolve(__dirname, '../../../../data/kalaa_database.json');
+    const candidatePath2 = path.resolve(process.cwd(), 'apps/api/data/kalaa_database.json');
+    const candidatePath3 = path.resolve(process.cwd(), 'data/kalaa_database.json');
+    
+    if (fs.existsSync(candidatePath1)) {
+      this.storagePath = candidatePath1;
+    } else if (fs.existsSync(candidatePath2)) {
+      this.storagePath = candidatePath2;
+    } else {
+      this.storagePath = candidatePath3;
+    }
+  }
 
   onModuleInit() {
     const supabaseUrl = process.env.SUPABASE_URL;
@@ -38,34 +55,119 @@ export class DatabaseService implements OnModuleInit {
         this.mode = 'supabase';
         this.logger.log(`Connecté à Supabase en mode production (${supabaseUrl})`);
       } catch (err: any) {
-        this.logger.warn(`Échec de connexion Supabase, repli sur le mode mémoire : ${err.message}`);
+        this.logger.warn(`Échec de connexion Supabase, repli sur le mode persistant local : ${err.message}`);
         this.mode = 'mock';
       }
     } else {
       this.mode = 'mock';
-      this.logger.log('Démarrage en mode Local/Mock avec données de test de Kalâa Seghira');
+      this.logger.log('Démarrage en mode Local Persistant avec données de Kalâa Seghira');
     }
 
-    this.seedMockData();
+    // Charger les référentiels
+    DEFAULT_MUNICIPAL_SERVICES.forEach((srv) => {
+      this.services.set(srv.id, { ...srv });
+    });
+    DEFAULT_CATEGORIES.forEach((cat) => {
+      this.categories.set(cat.id, { ...cat });
+    });
+
+    // Restaurer ou initialiser les données persistées
+    this.restoreOrSeedData();
   }
 
   getSupabase(): SupabaseClient | null {
     return this.supabase;
   }
 
+  public persistToDisk() {
+    try {
+      const data = {
+        users: Array.from(this.users.values()),
+        reports: Array.from(this.reports.values()),
+        statusHistory: this.statusHistory,
+        comments: this.comments,
+        savedAt: new Date().toISOString(),
+      };
+      const dir = path.dirname(this.storagePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.writeFileSync(this.storagePath, JSON.stringify(data, null, 2), 'utf8');
+      this.logger.log(`Données synchronisées sur disque (${this.reports.size} signalements, ${this.users.size} utilisateurs)`);
+    } catch (e: any) {
+      this.logger.error(`Échec d'écriture de la persistance : ${e.message}`);
+    }
+  }
+
+  private restoreOrSeedData() {
+    if (fs.existsSync(this.storagePath)) {
+      try {
+        const raw = fs.readFileSync(this.storagePath, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed.users)) {
+          parsed.users.forEach((u: User) => this.users.set(u.id, u));
+        }
+        if (Array.isArray(parsed.reports)) {
+          parsed.reports.forEach((r: Report) => this.reports.set(r.id, r));
+        }
+        if (Array.isArray(parsed.statusHistory)) {
+          this.statusHistory = parsed.statusHistory;
+        }
+        if (Array.isArray(parsed.comments)) {
+          this.comments = parsed.comments;
+        }
+        this.logger.log(`Base de données restaurée depuis ${this.storagePath} (${this.reports.size} signalements existants)`);
+        
+        // S'assurer que Nada Slama et Dalila Khlifa sont toujours présentes
+        this.ensureDefaultUsers();
+        return;
+      } catch (err: any) {
+        this.logger.warn(`Erreur lors de la lecture du fichier persistant (${err.message}), réinitialisation.`);
+      }
+    }
+
+    this.seedMockData();
+    this.persistToDisk();
+  }
+
+  private ensureDefaultUsers() {
+    if (!this.users.has('usr-citoyen-nada')) {
+      this.users.set('usr-citoyen-nada', {
+        id: 'usr-citoyen-nada',
+        nom: 'Nada Slama',
+        email: 'nada.slama@esprit.tn',
+        role: UserRole.CITOYEN,
+        langue: AppLanguage.FR,
+        telephone: '+21698111222',
+        cree_le: new Date().toISOString(),
+      });
+    }
+    if (!this.users.has('usr-admin-dalila')) {
+      this.users.set('usr-admin-dalila', {
+        id: 'usr-admin-dalila',
+        nom: 'Mme Dalila Khlifa',
+        email: 'dalila.khlifa@kalaa-soghra.gov.tn',
+        role: UserRole.ADMIN,
+        langue: AppLanguage.FR,
+        service_id: null,
+        telephone: '+21673000111',
+        cree_le: new Date().toISOString(),
+      });
+    }
+  }
+
   private seedMockData() {
-    // 1. Services
-    DEFAULT_MUNICIPAL_SERVICES.forEach((srv) => {
-      this.services.set(srv.id, { ...srv });
-    });
-
-    // 2. Catégories
-    DEFAULT_CATEGORIES.forEach((cat) => {
-      this.categories.set(cat.id, { ...cat });
-    });
-
-    // 3. Utilisateurs de démonstration
-    const testUsers: User[] = [
+    // Utilisateurs par défaut
+    const defaultUsers: User[] = [
+      {
+        id: 'usr-citoyen-nada',
+        nom: 'Nada Slama',
+        email: 'nada.slama@esprit.tn',
+        role: UserRole.CITOYEN,
+        langue: AppLanguage.FR,
+        telephone: '+21698111222',
+        cree_le: new Date().toISOString(),
+      },
       {
         id: 'usr-citoyen-imed',
         nom: 'Imed Attia',
@@ -73,6 +175,16 @@ export class DatabaseService implements OnModuleInit {
         role: UserRole.CITOYEN,
         langue: AppLanguage.FR,
         telephone: '+21698000111',
+        cree_le: new Date().toISOString(),
+      },
+      {
+        id: 'usr-admin-dalila',
+        nom: 'Mme Dalila Khlifa',
+        email: 'dalila.khlifa@kalaa-soghra.gov.tn',
+        role: UserRole.ADMIN,
+        langue: AppLanguage.FR,
+        service_id: null,
+        telephone: '+21673000111',
         cree_le: new Date().toISOString(),
       },
       {
@@ -107,10 +219,10 @@ export class DatabaseService implements OnModuleInit {
       },
     ];
 
-    testUsers.forEach((u) => this.users.set(u.id, u));
+    defaultUsers.forEach((u) => this.users.set(u.id, u));
 
-    // 4. Signalements de démonstration
-    const testReports: Report[] = [
+    // Signalements initiaux de démonstration
+    const initialReports: Report[] = [
       {
         id: 'rep-001',
         numero_ticket: 'KC-2026-0001',
@@ -125,7 +237,7 @@ export class DatabaseService implements OnModuleInit {
         photo_url: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600',
         statut: ReportStatus.NOUVEAU,
         priorite: ReportPriority.HAUTE,
-        auteur_id: 'usr-citoyen-imed',
+        auteur_id: 'usr-citoyen-nada',
         cree_le: new Date(Date.now() - 3600000 * 24).toISOString(),
         mis_a_jour_le: new Date(Date.now() - 3600000 * 24).toISOString(),
       },
@@ -143,7 +255,7 @@ export class DatabaseService implements OnModuleInit {
         photo_url: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600',
         statut: ReportStatus.ACCEPTE,
         priorite: ReportPriority.NORMALE,
-        auteur_id: 'usr-citoyen-imed',
+        auteur_id: 'usr-citoyen-nada',
         agent_id: 'usr-agent-voirie',
         cree_le: new Date(Date.now() - 3600000 * 48).toISOString(),
         mis_a_jour_le: new Date(Date.now() - 3600000 * 12).toISOString(),
@@ -162,7 +274,7 @@ export class DatabaseService implements OnModuleInit {
         photo_url: 'https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?w=600',
         statut: ReportStatus.RESOLU,
         priorite: ReportPriority.URGENTE,
-        auteur_id: 'usr-citoyen-imed',
+        auteur_id: 'usr-citoyen-nada',
         agent_id: 'usr-agent-proprete',
         photo_preuve_url: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600',
         cree_le: new Date(Date.now() - 3600000 * 72).toISOString(),
@@ -170,6 +282,6 @@ export class DatabaseService implements OnModuleInit {
       },
     ];
 
-    testReports.forEach((r) => this.reports.set(r.id, r));
+    initialReports.forEach((r) => this.reports.set(r.id, r));
   }
 }

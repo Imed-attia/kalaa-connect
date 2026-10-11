@@ -73,7 +73,7 @@ export const App: React.FC = () => {
             © 2026 Kalaa Connect — Plateforme Citoyenne de la Municipalité de Kalâa Seghira.
           </span>
           <span className="text-slate-400">
-            Projet de stage ingénieur ESPRIT · Option Cloud · Développé par Imed Attia
+            Projet de stage ingénieur ESPRIT · Option Cloud & DevSecOps · Développé par Nada SLAMA · Encadré par Mme Dalila KHLIFA
           </span>
         </div>
       </footer>
