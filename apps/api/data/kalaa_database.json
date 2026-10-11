@@ -84,6 +84,16 @@
       "service_id": null,
       "telephone": null,
       "cree_le": "2026-10-11T18:42:07.342Z"
+    },
+    {
+      "id": "usr-1791746643076",
+      "nom": "Citoyen Test",
+      "email": "citoyen.1791746642937@kalaa.tn",
+      "role": "citoyen",
+      "langue": "fr",
+      "service_id": null,
+      "telephone": null,
+      "cree_le": "2026-10-11T19:24:03.076Z"
     }
   ],
   "reports": [
@@ -608,6 +618,192 @@
       "mis_a_jour_le": "2026-10-11T18:42:07.386Z",
       "agent_id": "usr-agent-ali",
       "photo_preuve_url": "https://storage.kalaa.tn/preuve-reparation-voirie.jpg"
+    },
+    {
+      "id": "rep-1791746642060",
+      "numero_ticket": "KC-2026-0021",
+      "titre": "Nid-de-poule test",
+      "description": "Test description",
+      "categorie_id": "cat-nid-de-poule",
+      "categorie": {
+        "id": "cat-nid-de-poule",
+        "service_id": "srv-voirie",
+        "nom_fr": "Nid-de-poule ou chaussée dégradée",
+        "nom_ar": "حفرة أو طريق متضرر",
+        "delai_moyen_jours": 3
+      },
+      "service_id": "srv-voirie",
+      "latitude": 35.8285,
+      "longitude": 10.564,
+      "adresse_approximative": "Centre-Ville",
+      "quartier": "Centre-Ville",
+      "photo_url": "https://test.tn/photo.jpg",
+      "statut": "nouveau",
+      "priorite": "normale",
+      "auteur_id": "usr-citoyen-imed",
+      "auteur": {
+        "id": "usr-citoyen-imed",
+        "nom": "Imed Attia",
+        "email": "imedattia1032@gmail.com"
+      },
+      "cree_le": "2026-10-11T19:24:02.060Z",
+      "mis_a_jour_le": "2026-10-11T19:24:02.060Z"
+    },
+    {
+      "id": "rep-1791746642065",
+      "numero_ticket": "KC-2026-0022",
+      "titre": "Signalement à accepter",
+      "description": "Description",
+      "categorie_id": "cat-nid-de-poule",
+      "categorie": {
+        "id": "cat-nid-de-poule",
+        "service_id": "srv-voirie",
+        "nom_fr": "Nid-de-poule ou chaussée dégradée",
+        "nom_ar": "حفرة أو طريق متضرر",
+        "delai_moyen_jours": 3
+      },
+      "service_id": "srv-voirie",
+      "latitude": 35.8285,
+      "longitude": 10.564,
+      "adresse_approximative": "Centre-Ville",
+      "quartier": "Centre-Ville",
+      "photo_url": "https://test.tn/photo.jpg",
+      "statut": "accepte",
+      "priorite": "normale",
+      "auteur_id": "usr-citoyen-imed",
+      "auteur": {
+        "id": "usr-citoyen-imed",
+        "nom": "Imed Attia",
+        "email": "imedattia1032@gmail.com"
+      },
+      "cree_le": "2026-10-11T19:24:02.065Z",
+      "mis_a_jour_le": "2026-10-11T19:24:02.066Z",
+      "agent_id": "usr-agent-voirie"
+    },
+    {
+      "id": "rep-1791746642069",
+      "numero_ticket": "KC-2026-0023",
+      "titre": "Signalement en cours",
+      "description": "Description",
+      "categorie_id": "cat-nid-de-poule",
+      "categorie": {
+        "id": "cat-nid-de-poule",
+        "service_id": "srv-voirie",
+        "nom_fr": "Nid-de-poule ou chaussée dégradée",
+        "nom_ar": "حفرة أو طريق متضرر",
+        "delai_moyen_jours": 3
+      },
+      "service_id": "srv-voirie",
+      "latitude": 35.8285,
+      "longitude": 10.564,
+      "adresse_approximative": "Centre-Ville",
+      "quartier": "Centre-Ville",
+      "photo_url": "https://test.tn/photo.jpg",
+      "statut": "en_cours",
+      "priorite": "normale",
+      "auteur_id": "usr-citoyen-imed",
+      "auteur": {
+        "id": "usr-citoyen-imed",
+        "nom": "Imed Attia",
+        "email": "imedattia1032@gmail.com"
+      },
+      "cree_le": "2026-10-11T19:24:02.069Z",
+      "mis_a_jour_le": "2026-10-11T19:24:02.071Z",
+      "agent_id": "usr-agent-voirie"
+    },
+    {
+      "id": "rep-1791746642087",
+      "numero_ticket": "KC-2026-0024",
+      "titre": "Signalement prêt à résoudre",
+      "description": "Description",
+      "categorie_id": "cat-nid-de-poule",
+      "categorie": {
+        "id": "cat-nid-de-poule",
+        "service_id": "srv-voirie",
+        "nom_fr": "Nid-de-poule ou chaussée dégradée",
+        "nom_ar": "حفرة أو طريق متضرر",
+        "delai_moyen_jours": 3
+      },
+      "service_id": "srv-voirie",
+      "latitude": 35.8285,
+      "longitude": 10.564,
+      "adresse_approximative": "Centre-Ville",
+      "quartier": "Centre-Ville",
+      "photo_url": "https://test.tn/photo.jpg",
+      "statut": "resolu",
+      "priorite": "normale",
+      "auteur_id": "usr-citoyen-imed",
+      "auteur": {
+        "id": "usr-citoyen-imed",
+        "nom": "Imed Attia",
+        "email": "imedattia1032@gmail.com"
+      },
+      "cree_le": "2026-10-11T19:24:02.087Z",
+      "mis_a_jour_le": "2026-10-11T19:24:02.089Z",
+      "agent_id": "usr-agent-voirie",
+      "photo_preuve_url": "https://storage.tn/preuve.jpg"
+    },
+    {
+      "id": "rep-1791746642092",
+      "numero_ticket": "KC-2026-0025",
+      "titre": "Test saut d’étape",
+      "description": "Description",
+      "categorie_id": "cat-nid-de-poule",
+      "categorie": {
+        "id": "cat-nid-de-poule",
+        "service_id": "srv-voirie",
+        "nom_fr": "Nid-de-poule ou chaussée dégradée",
+        "nom_ar": "حفرة أو طريق متضرر",
+        "delai_moyen_jours": 3
+      },
+      "service_id": "srv-voirie",
+      "latitude": 35.8285,
+      "longitude": 10.564,
+      "adresse_approximative": "Centre-Ville",
+      "quartier": "Centre-Ville",
+      "photo_url": "https://test.tn/photo.jpg",
+      "statut": "nouveau",
+      "priorite": "normale",
+      "auteur_id": "usr-citoyen-imed",
+      "auteur": {
+        "id": "usr-citoyen-imed",
+        "nom": "Imed Attia",
+        "email": "imedattia1032@gmail.com"
+      },
+      "cree_le": "2026-10-11T19:24:02.092Z",
+      "mis_a_jour_le": "2026-10-11T19:24:02.092Z"
+    },
+    {
+      "id": "rep-1791746643092",
+      "numero_ticket": "KC-2026-0026",
+      "titre": "Nid-de-poule dangereux avenue Habib Bourguiba",
+      "description": "Trou profond au milieu de la voie rapide.",
+      "categorie_id": "cat-nid-de-poule",
+      "categorie": {
+        "id": "cat-nid-de-poule",
+        "service_id": "srv-voirie",
+        "nom_fr": "Nid-de-poule ou chaussée dégradée",
+        "nom_ar": "حفرة أو طريق متضرر",
+        "delai_moyen_jours": 3
+      },
+      "service_id": "srv-voirie",
+      "latitude": 35.8285,
+      "longitude": 10.564,
+      "adresse_approximative": "Centre-Ville",
+      "quartier": "Centre-Ville",
+      "photo_url": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600",
+      "statut": "cloture",
+      "priorite": "normale",
+      "auteur_id": "usr-citoyen-nada",
+      "auteur": {
+        "id": "usr-citoyen-nada",
+        "nom": "Nada SLAMA",
+        "email": "nada.slama@esprit.tn"
+      },
+      "cree_le": "2026-10-11T19:24:03.092Z",
+      "mis_a_jour_le": "2026-10-11T19:24:03.119Z",
+      "agent_id": "usr-agent-ali",
+      "photo_preuve_url": "https://storage.kalaa.tn/preuve-reparation-voirie.jpg"
     }
   ],
   "statusHistory": [
@@ -893,8 +1089,170 @@
       "acteur_nom": "Nada SLAMA",
       "commentaire": "Réparation constatée sur place, merci aux équipes municipales.",
       "date": "2026-10-11T18:42:07.386Z"
+    },
+    {
+      "id": "hist-1791746642060",
+      "signalement_id": "rep-1791746642060",
+      "ancien_statut": null,
+      "nouveau_statut": "nouveau",
+      "acteur_id": "usr-citoyen-imed",
+      "acteur_nom": "Imed Attia",
+      "commentaire": "Création du signalement par le citoyen",
+      "date": "2026-10-11T19:24:02.060Z"
+    },
+    {
+      "id": "hist-1791746642065",
+      "signalement_id": "rep-1791746642065",
+      "ancien_statut": null,
+      "nouveau_statut": "nouveau",
+      "acteur_id": "usr-citoyen-imed",
+      "acteur_nom": "Imed Attia",
+      "commentaire": "Création du signalement par le citoyen",
+      "date": "2026-10-11T19:24:02.065Z"
+    },
+    {
+      "id": "hist-1791746642066",
+      "signalement_id": "rep-1791746642065",
+      "ancien_statut": "nouveau",
+      "nouveau_statut": "accepte",
+      "acteur_id": "usr-agent-voirie",
+      "acteur_nom": "Ahmed Ben Salah",
+      "commentaire": "Passage au statut accepte",
+      "date": "2026-10-11T19:24:02.066Z"
+    },
+    {
+      "id": "hist-1791746642069",
+      "signalement_id": "rep-1791746642069",
+      "ancien_statut": null,
+      "nouveau_statut": "nouveau",
+      "acteur_id": "usr-citoyen-imed",
+      "acteur_nom": "Imed Attia",
+      "commentaire": "Création du signalement par le citoyen",
+      "date": "2026-10-11T19:24:02.069Z"
+    },
+    {
+      "id": "hist-1791746642070",
+      "signalement_id": "rep-1791746642069",
+      "ancien_statut": "nouveau",
+      "nouveau_statut": "accepte",
+      "acteur_id": "usr-agent-voirie",
+      "acteur_nom": "Ahmed Ben Salah",
+      "commentaire": "Passage au statut accepte",
+      "date": "2026-10-11T19:24:02.070Z"
+    },
+    {
+      "id": "hist-1791746642071",
+      "signalement_id": "rep-1791746642069",
+      "ancien_statut": "accepte",
+      "nouveau_statut": "en_cours",
+      "acteur_id": "usr-agent-voirie",
+      "acteur_nom": "Ahmed Ben Salah",
+      "commentaire": "Passage au statut en_cours",
+      "date": "2026-10-11T19:24:02.071Z"
+    },
+    {
+      "id": "hist-1791746642087",
+      "signalement_id": "rep-1791746642087",
+      "ancien_statut": null,
+      "nouveau_statut": "nouveau",
+      "acteur_id": "usr-citoyen-imed",
+      "acteur_nom": "Imed Attia",
+      "commentaire": "Création du signalement par le citoyen",
+      "date": "2026-10-11T19:24:02.087Z"
+    },
+    {
+      "id": "hist-1791746642088",
+      "signalement_id": "rep-1791746642087",
+      "ancien_statut": "nouveau",
+      "nouveau_statut": "accepte",
+      "acteur_id": "usr-agent-voirie",
+      "acteur_nom": "Ahmed Ben Salah",
+      "commentaire": "Passage au statut accepte",
+      "date": "2026-10-11T19:24:02.088Z"
+    },
+    {
+      "id": "hist-1791746642088",
+      "signalement_id": "rep-1791746642087",
+      "ancien_statut": "accepte",
+      "nouveau_statut": "en_cours",
+      "acteur_id": "usr-agent-voirie",
+      "acteur_nom": "Ahmed Ben Salah",
+      "commentaire": "Passage au statut en_cours",
+      "date": "2026-10-11T19:24:02.088Z"
+    },
+    {
+      "id": "hist-1791746642089",
+      "signalement_id": "rep-1791746642087",
+      "ancien_statut": "en_cours",
+      "nouveau_statut": "resolu",
+      "acteur_id": "usr-agent-voirie",
+      "acteur_nom": "Ahmed Ben Salah",
+      "commentaire": "Passage au statut resolu",
+      "photo_preuve_url": "https://storage.tn/preuve.jpg",
+      "date": "2026-10-11T19:24:02.089Z"
+    },
+    {
+      "id": "hist-1791746642092",
+      "signalement_id": "rep-1791746642092",
+      "ancien_statut": null,
+      "nouveau_statut": "nouveau",
+      "acteur_id": "usr-citoyen-imed",
+      "acteur_nom": "Imed Attia",
+      "commentaire": "Création du signalement par le citoyen",
+      "date": "2026-10-11T19:24:02.092Z"
+    },
+    {
+      "id": "hist-1791746643092",
+      "signalement_id": "rep-1791746643092",
+      "ancien_statut": null,
+      "nouveau_statut": "nouveau",
+      "acteur_id": "usr-citoyen-nada",
+      "acteur_nom": "Nada SLAMA",
+      "commentaire": "Création du signalement par le citoyen",
+      "date": "2026-10-11T19:24:03.092Z"
+    },
+    {
+      "id": "hist-1791746643099",
+      "signalement_id": "rep-1791746643092",
+      "ancien_statut": "nouveau",
+      "nouveau_statut": "accepte",
+      "acteur_id": "usr-agent-ali",
+      "acteur_nom": "Ali Mansour",
+      "commentaire": "Ticket pris en charge par le service voirie",
+      "date": "2026-10-11T19:24:03.099Z"
+    },
+    {
+      "id": "hist-1791746643105",
+      "signalement_id": "rep-1791746643092",
+      "ancien_statut": "accepte",
+      "nouveau_statut": "en_cours",
+      "acteur_id": "usr-agent-ali",
+      "acteur_nom": "Ali Mansour",
+      "commentaire": "Passage au statut en_cours",
+      "date": "2026-10-11T19:24:03.105Z"
+    },
+    {
+      "id": "hist-1791746643114",
+      "signalement_id": "rep-1791746643092",
+      "ancien_statut": "en_cours",
+      "nouveau_statut": "resolu",
+      "acteur_id": "usr-agent-ali",
+      "acteur_nom": "Ali Mansour",
+      "commentaire": "Passage au statut resolu",
+      "photo_preuve_url": "https://storage.kalaa.tn/preuve-reparation-voirie.jpg",
+      "date": "2026-10-11T19:24:03.114Z"
+    },
+    {
+      "id": "hist-1791746643119",
+      "signalement_id": "rep-1791746643092",
+      "ancien_statut": "resolu",
+      "nouveau_statut": "cloture",
+      "acteur_id": "usr-citoyen-nada",
+      "acteur_nom": "Nada SLAMA",
+      "commentaire": "Réparation constatée sur place, merci aux équipes municipales.",
+      "date": "2026-10-11T19:24:03.119Z"
     }
   ],
   "comments": [],
-  "savedAt": "2026-10-11T18:42:07.386Z"
+  "savedAt": "2026-10-11T19:24:03.119Z"
 }

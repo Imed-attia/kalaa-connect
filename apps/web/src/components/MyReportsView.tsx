@@ -2,35 +2,44 @@ import React, { useState, useEffect } from 'react';
 import { Report, AppLanguage, ReportStatus, ReportPriority } from '@kalaa-connect/shared';
 import { apiClient } from '../api';
 import { TRANSLATIONS } from '../i18n';
+import { UserProfile } from '../firebase';
 import {
   CheckCircle2,
   Clock,
   MapPin,
   Calendar,
-  Check,
   Edit3,
   Trash2,
   X,
   Save,
   AlertCircle,
+  ShieldCheck,
+  Check,
+  ArrowRight,
+  Filter,
+  RefreshCw,
 } from 'lucide-react';
 
 interface Props {
   lang: AppLanguage;
+  currentUser: UserProfile | null;
+  onRequireAuth: () => void;
 }
 
-export const MyReportsView: React.FC<Props> = ({ lang }) => {
+export const MyReportsView: React.FC<Props> = ({ lang, currentUser, onRequireAuth }) => {
   const t = TRANSLATIONS[lang];
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState<string>('all');
 
-  // Édition d'un signalement
+  // Interactive Edit Modal State
   const [editingReport, setEditingReport] = useState<Report | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editPriority, setEditPriority] = useState<ReportPriority>(ReportPriority.NORMALE);
   const [editError, setEditError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   useEffect(() => {
     loadReports();
@@ -38,9 +47,17 @@ export const MyReportsView: React.FC<Props> = ({ lang }) => {
 
   const loadReports = async () => {
     setLoading(true);
-    const data = await apiClient.getReports();
-    setReports(data);
-    setLoading(false);
+    try {
+      const data = await apiClient.getReports();
+      setReports(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3000);
   };
 
   const handleOpenEdit = (report: Report) => {
@@ -63,7 +80,7 @@ export const MyReportsView: React.FC<Props> = ({ lang }) => {
     setIsSaving(true);
     setEditError(null);
     try {
-      await apiClient.updateReport(
+      const updated = await apiClient.updateReport(
         editingReport.id,
         {
           titre: editTitle.trim(),
@@ -72,20 +89,27 @@ export const MyReportsView: React.FC<Props> = ({ lang }) => {
         },
         'test-token-citoyen',
       );
+
+      // Met à jour la liste locale immédiatement
+      setReports((prev) =>
+        prev.map((r) => (r.id === editingReport.id ? { ...r, ...updated, titre: editTitle, description: editDescription, priorite: editPriority } : r))
+      );
       setEditingReport(null);
-      await loadReports();
+      showToast('Signalement mis à jour avec succès dans Firestore !');
     } catch (err: any) {
-      setEditError(err.message || 'Erreur lors de la mise à jour');
+      console.error('Update error:', err);
+      setEditError(err.message || 'Erreur lors de la mise à jour.');
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDelete = async (reportId: string) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce signalement ?')) return;
+    if (!window.confirm('Voulez-vous supprimer définitivement ce signalement ?')) return;
     try {
       await apiClient.deleteReport(reportId, 'test-token-citoyen');
-      await loadReports();
+      setReports((prev) => prev.filter((r) => r.id !== reportId));
+      showToast('Signalement supprimé de la base de données.');
     } catch (err: any) {
       alert(err.message || 'Erreur lors de la suppression');
     }
@@ -101,182 +125,271 @@ export const MyReportsView: React.FC<Props> = ({ lang }) => {
         },
         'test-token-citoyen',
       );
-      await loadReports();
+      setReports((prev) =>
+        prev.map((r) => (r.id === reportId ? { ...r, statut: ReportStatus.CLOTURE } : r))
+      );
+      showToast('Ticket clôturé avec succès.');
     } catch (err: any) {
       alert(err.message || 'Erreur lors de la clôture');
     }
   };
 
+  const filteredReports = reports.filter((r) => {
+    if (filterStatus === 'all') return true;
+    return r.statut === filterStatus;
+  });
+
+  const getStatusBadge = (statut: ReportStatus) => {
+    switch (statut) {
+      case ReportStatus.NOUVEAU:
+        return { label: 'Nouveau', bg: 'bg-blue-50 text-blue-700 border-blue-200' };
+      case ReportStatus.ACCEPTE:
+        return { label: 'Pris en charge', bg: 'bg-amber-50 text-amber-700 border-amber-200' };
+      case ReportStatus.EN_COURS:
+        return { label: 'Intervention en cours', bg: 'bg-indigo-50 text-indigo-700 border-indigo-200' };
+      case ReportStatus.RESOLU:
+        return { label: 'Résolu (Travaux finis)', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
+      case ReportStatus.CLOTURE:
+        return { label: 'Clôturé & Validé', bg: 'bg-slate-100 text-slate-700 border-slate-300' };
+      default:
+        return { label: statut, bg: 'bg-slate-50 text-slate-600 border-slate-200' };
+    }
+  };
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
+    <div className="max-w-5xl mx-auto px-4 py-8 animate-fadeIn">
+      {/* Toast Notification */}
+      {toastMsg && (
+        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 text-xs font-semibold flex items-center gap-2 animate-slideUp">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
+
+      {/* Header bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200/80 mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">{t.nav.myReports}</h2>
-          <p className="text-sm text-slate-500">
-            Suivez et mettez à jour l’état d’avancement de vos signalements — Municipalité de Kalâa Seghira
+          <div className="flex items-center gap-2 mb-1">
+            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+              {lang === AppLanguage.AR ? 'متابعة البلاغات البلدية' : 'Suivi des Signalements Municipaux'}
+            </h1>
+            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 border border-sky-200">
+              {reports.length} tickets
+            </span>
+          </div>
+          <p className="text-xs text-slate-500">
+            Consultez, modifiez et suivez l’avancement des interventions techniques en direct sur le territoire de Kalâa Seghira.
           </p>
         </div>
-        <button
-          onClick={loadReports}
-          className="text-xs font-semibold px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
-        >
-          Actualiser
-        </button>
+
+        {/* Filter pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+          <button
+            onClick={() => setFilterStatus('all')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              filterStatus === 'all'
+                ? 'bg-sky-600 text-white shadow-xs'
+                : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            Tous ({reports.length})
+          </button>
+          <button
+            onClick={() => setFilterStatus(ReportStatus.NOUVEAU)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              filterStatus === ReportStatus.NOUVEAU
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            Nouveaux
+          </button>
+          <button
+            onClick={() => setFilterStatus(ReportStatus.EN_COURS)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              filterStatus === ReportStatus.EN_COURS
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            En cours
+          </button>
+          <button
+            onClick={() => setFilterStatus(ReportStatus.RESOLU)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              filterStatus === ReportStatus.RESOLU
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            Résolus
+          </button>
+          <button
+            onClick={loadReports}
+            className="p-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition-colors"
+            title="Rafraîchir depuis Firestore"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
       </div>
 
+      {/* Reports List */}
       {loading ? (
-        <div className="text-center py-12 text-slate-400">Chargement de vos signalements...</div>
-      ) : reports.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
-          <Clock className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="font-bold text-slate-700">Aucun signalement actif</h3>
-          <p className="text-xs text-slate-400 mt-1">
-            Utilisez le bouton « Signaler » pour déclarer un problème urbain dans votre quartier.
-          </p>
+        <div className="py-20 text-center">
+          <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-xs text-slate-500 font-medium">Chargement des signalements depuis Cloud Firestore...</p>
+        </div>
+      ) : filteredReports.length === 0 ? (
+        <div className="p-12 text-center bg-white rounded-2xl border border-dashed border-slate-300">
+          <AlertCircle className="w-10 h-10 text-slate-400 mx-auto mb-2" />
+          <h3 className="text-sm font-bold text-slate-700">Aucun signalement trouvé</h3>
+          <p className="text-xs text-slate-500 mt-1">Vous n’avez aucun ticket pour ce filtre actuellement.</p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {reports.map((report) => (
-            <div
-              key={report.id}
-              className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-bold px-2 py-0.5 bg-slate-100 text-slate-700 rounded-md">
-                    #{report.numero_ticket}
-                  </span>
-                  <span className="font-semibold text-slate-900 text-base">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredReports.map((report) => {
+            const badge = getStatusBadge(report.statut);
+            return (
+              <div
+                key={report.id}
+                className="bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all p-5 flex flex-col justify-between group"
+              >
+                <div>
+                  {/* Top Bar: Ticket Number & Status Badge */}
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <span className="font-mono text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                      {report.numero_ticket}
+                    </span>
+                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${badge.bg}`}>
+                      {badge.label}
+                    </span>
+                  </div>
+
+                  {/* Title & Description */}
+                  <h3 className="text-sm font-bold text-slate-900 group-hover:text-sky-700 transition-colors mb-1">
                     {report.titre}
-                  </span>
-                </div>
+                  </h3>
+                  <p className="text-xs text-slate-600 line-clamp-2 mb-3 leading-relaxed">
+                    {report.description}
+                  </p>
 
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                    {t.status[report.statut] || report.statut}
-                  </span>
-                  <span className="text-xs font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-600">
-                    {report.priorite || 'Normale'}
-                  </span>
-                </div>
-              </div>
-
-              <p className="text-sm text-slate-600 mb-4">{report.description}</p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                {/* Photo initiale */}
-                {report.photo_url && (
-                  <div>
-                    <span className="text-xs font-semibold text-slate-500 block mb-1">
-                      Photo transmise :
-                    </span>
-                    <img
-                      src={report.photo_url}
-                      alt="Incident"
-                      className="w-full h-36 object-cover rounded-lg border border-slate-200 shadow-sm"
-                    />
+                  {/* Meta Information */}
+                  <div className="space-y-1 text-[11px] text-slate-500 border-t border-slate-100 pt-3">
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                      <span className="truncate">{report.adresse_approximative || report.quartier || 'Kalâa Seghira'}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>{new Date(report.cree_le).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                    </div>
                   </div>
-                )}
 
-                {/* Photo de preuve si résolu */}
-                {report.photo_preuve_url && (
-                  <div>
-                    <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1 mb-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      Preuve de résolution des agents municipaux :
-                    </span>
-                    <img
-                      src={report.photo_preuve_url}
-                      alt="Preuve"
-                      className="w-full h-36 object-cover rounded-lg border border-emerald-300 shadow-sm"
-                    />
-                  </div>
-                )}
-              </div>
+                  {/* Photo Preview Thumbnail */}
+                  {report.photo_url && (
+                    <div className="mt-3 rounded-xl overflow-hidden aspect-video max-h-36 bg-slate-100 border border-slate-200">
+                      <img
+                        src={report.photo_url}
+                        alt={report.titre}
+                        className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
 
-              <div className="flex flex-wrap items-center justify-between pt-3 border-t border-slate-100 gap-2">
-                <div className="flex items-center gap-4 text-xs text-slate-400">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5" />
-                    {report.quartier || 'Kalâa Seghira'}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5" />
-                    {new Date(report.cree_le).toLocaleDateString()}
-                  </span>
+                  {/* Photo de Preuve si Résolu */}
+                  {report.photo_preuve_url && (
+                    <div className="mt-2.5 p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-800">
+                      <span className="font-bold block mb-1">📷 Preuve de résolution municipale :</span>
+                      <img
+                        src={report.photo_preuve_url}
+                        alt="Preuve"
+                        className="w-full max-h-28 object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-2">
-                  {/* Bouton Modifier */}
-                  <button
-                    onClick={() => handleOpenEdit(report)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition-colors"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" />
-                    Modifier
-                  </button>
+                {/* Actions Bar */}
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    {/* Bouton Éditer (Update) */}
+                    <button
+                      onClick={() => handleOpenEdit(report)}
+                      className="px-2.5 py-1 rounded-lg border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                      title="Modifier les détails du signalement"
+                    >
+                      <Edit3 className="w-3.5 h-3.5 text-sky-600" />
+                      <span>Modifier</span>
+                    </button>
 
-                  {/* Bouton Supprimer */}
-                  <button
-                    onClick={() => handleDelete(report.id)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-semibold transition-colors"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    Supprimer
-                  </button>
+                    {/* Bouton Supprimer */}
+                    <button
+                      onClick={() => handleDelete(report.id)}
+                      className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                      title="Supprimer ce signalement"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
 
-                  {/* Si le ticket est résolu, confirmation citoyenne */}
+                  {/* Bouton Clôturer par le citoyen si RESOLU */}
                   {report.statut === ReportStatus.RESOLU && (
                     <button
                       onClick={() => handleConfirmClose(report.id)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm transition-colors"
+                      className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1 transition-colors shadow-xs"
                     >
                       <Check className="w-3.5 h-3.5" />
-                      Confirmer la clôture
+                      <span>Confirmer clôture</span>
                     </button>
                   )}
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      {/* MODAL DE MODIFICATION DU SIGNALEMENT */}
+      {/* Edit Modal (Modification Interactive) */}
       {editingReport && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 animate-scaleUp">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-blue-600" />
-                Modifier le signalement #{editingReport.numero_ticket}
-              </h3>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">
+                  Modifier le Signalement
+                </h3>
+                <p className="text-xs text-slate-500 font-mono">
+                  {editingReport.numero_ticket}
+                </p>
+              </div>
               <button
                 onClick={() => setEditingReport(null)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+                className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {editError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg flex items-center gap-2">
+              <div className="p-3 mb-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                {editError}
+                <span>{editError}</span>
               </div>
             )}
 
             <form onSubmit={handleSaveEdit} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Titre du problème
+                  Titre du signalement
                 </label>
                 <input
                   type="text"
+                  required
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  required
+                  className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                 />
               </div>
 
@@ -285,44 +398,44 @@ export const MyReportsView: React.FC<Props> = ({ lang }) => {
                   Description détaillée
                 </label>
                 <textarea
-                  rows={3}
+                  rows={4}
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Priorité estimée
+                  Niveau de priorité estimé
                 </label>
                 <select
                   value={editPriority}
                   onChange={(e) => setEditPriority(e.target.value as ReportPriority)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-white"
                 >
                   <option value={ReportPriority.BASSE}>Basse</option>
                   <option value={ReportPriority.NORMALE}>Normale</option>
                   <option value={ReportPriority.HAUTE}>Haute</option>
-                  <option value={ReportPriority.URGENTE}>Urgente</option>
+                  <option value={ReportPriority.URGENTE}>Urgente (Danger immédiat)</option>
                 </select>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setEditingReport(null)}
-                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-5 py-2 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2 shadow-sm transition-colors"
+                  className="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm disabled:opacity-60"
                 >
                   <Save className="w-4 h-4" />
-                  {isSaving ? 'Enregistrement...' : 'Enregistrer les modifications'}
+                  <span>{isSaving ? 'Enregistrement...' : 'Enregistrer les modifications'}</span>
                 </button>
               </div>
             </form>
