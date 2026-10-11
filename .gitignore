@@ -44,5 +44,7 @@ override.tf.json
 *_override.tf.json
 
 # Uploads temporaires locaux
-uploads/
-temp/
+/uploads/
+/temp/
+apps/api/uploads/
+!apps/api/src/modules/uploads/
