@@ -54,6 +54,24 @@ export interface UserProfile {
   titre_poste?: string;
 }
 
+/**
+ * Supprime récursivement les clés ayant la valeur undefined
+ * pour éviter l'erreur Firestore: "Unsupported field value: undefined"
+ */
+export function removeUndefined<T extends Record<string, any>>(obj: T): Partial<T> {
+  const clean: Record<string, any> = {};
+  for (const [key, val] of Object.entries(obj)) {
+    if (val !== undefined) {
+      if (val !== null && typeof val === 'object' && !Array.isArray(val) && !(val instanceof Date)) {
+        clean[key] = removeUndefined(val);
+      } else {
+        clean[key] = val;
+      }
+    }
+  }
+  return clean as Partial<T>;
+}
+
 // ----------------- AUTHENTICATION HELPERS -----------------
 
 export async function loginWithGoogle(): Promise<UserProfile> {
@@ -62,22 +80,48 @@ export async function loginWithGoogle(): Promise<UserProfile> {
   
   // Check if profile exists in Firestore, otherwise create
   const userRef = doc(db, 'users', fbUser.uid);
-  const userSnap = await getDoc(userRef);
-  
   let profile: UserProfile;
-  if (userSnap.exists()) {
-    profile = userSnap.data() as UserProfile;
-  } else {
-    profile = {
-      id: fbUser.uid,
-      nom: fbUser.displayName || 'Citoyen Kalâa',
-      email: fbUser.email || '',
-      role: UserRole.CITOYEN,
-      avatar_url: fbUser.photoURL || undefined,
-      telephone: fbUser.phoneNumber || undefined,
-    };
-    await setDoc(userRef, profile);
+
+  try {
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      profile = userSnap.data() as UserProfile;
+      return profile;
+    }
+  } catch (err) {
+    console.warn('Erreur lecture Firestore profil utilisateur Google:', err);
   }
+
+  // Nouveau profil utilisateur : aucun champ undefined
+  const cleanData: Record<string, any> = {
+    id: fbUser.uid,
+    nom: fbUser.displayName || 'Citoyen Kalâa',
+    email: fbUser.email || '',
+    role: UserRole.CITOYEN,
+  };
+
+  if (fbUser.photoURL) {
+    cleanData.avatar_url = fbUser.photoURL;
+  }
+  if (fbUser.phoneNumber) {
+    cleanData.telephone = fbUser.phoneNumber;
+  }
+
+  try {
+    await setDoc(userRef, cleanData);
+  } catch (err) {
+    console.error('Erreur enregistrement profil Google dans Firestore:', err);
+  }
+
+  profile = {
+    id: fbUser.uid,
+    nom: cleanData.nom,
+    email: cleanData.email,
+    role: UserRole.CITOYEN,
+    ...(cleanData.avatar_url ? { avatar_url: cleanData.avatar_url } : {}),
+    ...(cleanData.telephone ? { telephone: cleanData.telephone } : {}),
+  };
+
   return profile;
 }
 
@@ -85,11 +129,16 @@ export async function loginWithEmail(email: string, pass: string): Promise<UserP
   const cred = await signInWithEmailAndPassword(auth, email, pass);
   const fbUser = cred.user;
   
-  const userRef = doc(db, 'users', fbUser.uid);
-  const userSnap = await getDoc(userRef);
-  if (userSnap.exists()) {
-    return userSnap.data() as UserProfile;
+  try {
+    const userRef = doc(db, 'users', fbUser.uid);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      return userSnap.data() as UserProfile;
+    }
+  } catch (err) {
+    console.warn('Erreur lecture profil Firestore:', err);
   }
+
   return {
     id: fbUser.uid,
     nom: fbUser.displayName || email.split('@')[0],
@@ -108,18 +157,35 @@ export async function registerWithEmail(
   const cred = await createUserWithEmailAndPassword(auth, email, pass);
   const fbUser = cred.user;
   
-  await updateProfile(fbUser, { displayName: nom });
+  try {
+    await updateProfile(fbUser, { displayName: nom });
+  } catch (err) {
+    console.warn('Erreur mise à jour displayName:', err);
+  }
   
-  const profile: UserProfile = {
+  const cleanData: Record<string, any> = {
     id: fbUser.uid,
     nom,
     email,
     role,
-    telephone,
   };
+  if (telephone && telephone.trim()) {
+    cleanData.telephone = telephone.trim();
+  }
   
-  await setDoc(doc(db, 'users', fbUser.uid), profile);
-  return profile;
+  try {
+    await setDoc(doc(db, 'users', fbUser.uid), cleanData);
+  } catch (err) {
+    console.error('Erreur setDoc profil Email dans Firestore:', err);
+  }
+
+  return {
+    id: fbUser.uid,
+    nom,
+    email,
+    role,
+    ...(cleanData.telephone ? { telephone: cleanData.telephone } : {}),
+  };
 }
 
 export async function logoutUser(): Promise<void> {
@@ -154,28 +220,30 @@ export async function createFirestoreReport(reportData: Partial<Report>): Promis
     titre: reportData.titre || '',
     description: reportData.description || '',
     categorie_id: reportData.categorie_id || 'cat-nid-de-poule',
-    latitude: reportData.latitude || 35.8285,
-    longitude: reportData.longitude || 10.5640,
+    latitude: reportData.latitude ?? 35.8285,
+    longitude: reportData.longitude ?? 10.5640,
     adresse_approximative: reportData.adresse_approximative || 'Kalâa Seghira',
     quartier: reportData.quartier || 'Centre-Ville',
     photo_url: reportData.photo_url || 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600',
-    statut: ReportStatus.NOUVEAU,
+    statut: reportData.statut || ReportStatus.NOUVEAU,
     priorite: reportData.priorite || ('normale' as any),
     auteur_id: reportData.auteur_id || 'usr-citoyen-nada',
     cree_le: now,
     mis_a_jour_le: now,
   };
   
-  await setDoc(doc(db, 'reports', id), newReport);
+  const cleanDoc = removeUndefined(newReport);
+  await setDoc(doc(db, 'reports', id), cleanDoc);
   return newReport;
 }
 
 export async function updateFirestoreReport(id: string, updateData: Partial<Report>): Promise<void> {
   const docRef = doc(db, 'reports', id);
-  await updateDoc(docRef, {
+  const cleanUpdate = removeUndefined({
     ...updateData,
     mis_a_jour_le: new Date().toISOString(),
   });
+  await updateDoc(docRef, cleanUpdate);
 }
 
 export async function deleteFirestoreReport(id: string): Promise<void> {
