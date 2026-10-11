@@ -29,6 +29,10 @@
   "author": "Imed Attia <imedattia1032@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "pdf-lib": "^1.17.1"
+    "pdf-lib": "^1.17.1",
+    "pdf-parse": "^2.4.5"
+  },
+  "dependencies": {
+    "marked": "^18.1.0"
   }
 }
