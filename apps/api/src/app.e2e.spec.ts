@@ -102,7 +102,7 @@ describe('Kalaa Connect API — Suite de tests End-to-End (E2E)', () => {
         .set('Authorization', 'Bearer test-token-citoyen');
 
       expect(res.status).toBe(200);
-      expect(res.body.nom).toBe('Nada Slama');
+      expect(res.body.nom.toLowerCase()).toBe('nada slama');
     });
   });
 

@@ -92,11 +92,11 @@ export class AuthGuard implements CanActivate {
     if (token === 'test-token-admin' || token === 'usr-admin-dalila') {
       return this.db.users.get('usr-admin-dalila') || this.db.users.get('usr-admin-municipal');
     }
-    if (token === 'test-token-agent' || token === 'usr-agent-voirie') {
-      return this.db.users.get('usr-agent-voirie');
+    if (token === 'test-token-agent' || token === 'usr-agent-voirie' || token === 'usr-agent-ali') {
+      return this.db.users.get('usr-agent-ali') || this.db.users.get('usr-agent-voirie');
     }
-    if (token === 'test-token-agent-proprete' || token === 'usr-agent-proprete') {
-      return this.db.users.get('usr-agent-proprete');
+    if (token === 'test-token-agent-proprete' || token === 'usr-agent-proprete' || token === 'usr-agent-sami') {
+      return this.db.users.get('usr-agent-sami') || this.db.users.get('usr-agent-proprete');
     }
     return this.db.users.get(token);
   }
