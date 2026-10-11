@@ -1108,7 +1108,7 @@ Pour garantir une productivité élevée et un respect rigoureux des bonnes prat
 | **Visual Studio Code (VS Code)** | Éditeur de code source principal enrichi des extensions officielles TypeScript, ESLint, Prettier, Tailwind CSS IntelliSense et Prisma Studio. |
 | **Node.js (v24.x)** | Environnement d'exécution JavaScript côté serveur haute performance basé sur le moteur V8 de Google Chrome, assurant le fonctionnement du serveur NestJS et des outils de bundling. |
 | **npm (Node Package Manager)** | Gestionnaire de dépendances et coordinateur du monorepo modulaire (`workspaces` NestJS et React). |
-| **Git & GitHub** | Système de contrôle de version décentralisé assurant le suivi fin de l'historique des modifications, la gestion des branches par Sprint et la sauvegarde sécurisée sur le dépôt distant : `https://github.com/Imed-attia/kalaa-connect.git`. |
+| **Git & GitHub** | Système de contrôle de version décentralisé assurant le suivi fin de l'historique des modifications, la gestion des branches par Sprint et la sauvegarde sécurisée sur le dépôt distant : `https://github.com/nadaslama23/kalaa-connect.git`. |
 | **Postman** | Outil d'exploration et de test interactif des points d'accès de l'API RESTful (validation des corps de requêtes, codes de réponse HTTP et en-têtes JWT). |
 | **Prisma Studio / CLI** | Outil graphique interactif et suite de commandes de migration permettant d'inspecter, manipuler et auditer directement la base de données relationnelle. |
 | **Microsoft Edge & Google Chrome** | Navigateurs Web de référence utilisés pour le débogage interactif des interfaces réactives, l'émulation mobile des dimensions d'écrans et l'inspection PWA (Lighthouse, Service Workers, LocalStorage). |
@@ -1555,4 +1555,4 @@ En conclusion, ce stage de perfectionnement aura été une expérience formatric
 - **[W6]** *Guide officiel Tailwind CSS* : [https://tailwindcss.com/docs](https://tailwindcss.com/docs), consulté le 22/09/2026.
 - **[W7]** *Spécification UML 2.5 par l'Object Management Group (OMG)* : [https://www.omg.org/spec/UML/](https://www.omg.org/spec/UML/), consultée le 25/09/2026.
 - **[W8]** *MDN Web Docs - Geolocation API & Progressive Web Apps* : [https://developer.mozilla.org/fr/docs/Web/API/Geolocation_API](https://developer.mozilla.org/fr/docs/Web/API/Geolocation_API), consultée le 28/09/2026.
-- **[W9]** *Dépôt GitHub du projet Kalaa Connect* : [https://github.com/Imed-attia/kalaa-connect.git](https://github.com/Imed-attia/kalaa-connect.git), consulté le 11/10/2026.
+- **[W9]** *Dépôt GitHub du projet Kalaa Connect* : [https://github.com/nadaslama23/kalaa-connect.git](https://github.com/nadaslama23/kalaa-connect.git), consulté le 11/10/2026.
