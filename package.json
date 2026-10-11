@@ -27,5 +27,8 @@
     "gemini-ai"
   ],
   "author": "Imed Attia <imedattia1032@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "pdf-lib": "^1.17.1"
+  }
 }
