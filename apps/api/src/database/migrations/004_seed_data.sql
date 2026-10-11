@@ -23,12 +23,12 @@ INSERT INTO categories (id, nom_fr, nom_ar, service_id, delai_moyen_jours) VALUE
 ('c4444444-4444-4444-4444-222222222222', 'Herbes sèches et risque d’incendie', 'أعشاب يابسة وخطر حريق', '44444444-4444-4444-4444-444444444444', 4)
 ON CONFLICT (id) DO NOTHING;
 
--- 3. Utilisateurs de test
+-- 3. Utilisateurs de test & d'encadrement
 INSERT INTO utilisateurs (id, nom, email, role, langue, service_id, telephone) VALUES
-('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Imed Attia', 'imedattia1032@gmail.com', 'citoyen', 'fr', NULL, '+21698000111'),
-('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Ahmed Ben Salah', 'agent.voirie@kalaa-soghra.gov.tn', 'agent', 'fr', '11111111-1111-1111-1111-111111111111', '+21698000222'),
-('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Sami Mansour', 'agent.proprete@kalaa-soghra.gov.tn', 'agent', 'ar', '33333333-3333-3333-3333-333333333333', '+21698000333'),
-('dddddddd-dddd-dddd-dddd-dddddddddddd', 'Administrateur Municipal', 'admin@kalaa-soghra.gov.tn', 'admin', 'fr', NULL, '+21673000000')
+('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Nada SLAMA', 'nada.slama@esprit.tn', 'citoyen', 'fr', NULL, '+21698123456'),
+('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Ali Mansour', 'ali.mansour@commune-kalaaseghira.gov.tn', 'agent', 'fr', '11111111-1111-1111-1111-111111111111', '+21698234567'),
+('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Sami Mansour', 'sami.mansour@commune-kalaaseghira.gov.tn', 'agent', 'ar', '33333333-3333-3333-3333-333333333333', '+21698345678'),
+('dddddddd-dddd-dddd-dddd-dddddddddddd', 'Mme Dalila KHLIFA', 'dalila.khlifa@commune-kalaaseghira.gov.tn', 'admin', 'fr', NULL, '+21673252022')
 ON CONFLICT (id) DO NOTHING;
 
 -- 4. Exemples de signalements à Kalâa Seghira
