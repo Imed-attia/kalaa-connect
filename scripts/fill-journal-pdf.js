@@ -24,29 +24,29 @@ async function fillJournal() {
   const primaryColor = rgb(0.08, 0.5, 0.25);
 
   // Nom et prénom
-  page1.drawText('Imed Attia', { x: 260, y: 642, size: 10, font: helveticaBold, color: textColor });
+  page1.drawText('Nada SLAMA', { x: 260, y: 642, size: 10, font: helveticaBold, color: textColor });
   // ID
-  page1.drawText('224JMT0125', { x: 260, y: 602, size: 10, font: helveticaFont, color: textColor });
+  page1.drawText('224JMT0418', { x: 260, y: 602, size: 10, font: helveticaFont, color: textColor });
   // Entreprise
-  page1.drawText('Municipalite de Kalaa Seghira (Sousse)', { x: 300, y: 582, size: 9.5, font: helveticaBold, color: textColor });
-  page1.drawText('Avenue Habib Bourguiba, 4021 Kalaa Seghira', { x: 300, y: 562, size: 9, font: helveticaFont, color: textColor });
+  page1.drawText('Municipalité de Kalâa Seghira (Sousse)', { x: 300, y: 582, size: 9.5, font: helveticaBold, color: textColor });
+  page1.drawText('Avenue Habib Bourguiba, 4021 Kalâa Seghira', { x: 300, y: 562, size: 9, font: helveticaFont, color: textColor });
   // Encadrant
-  page1.drawText('Direction des Services Techniques et SI', { x: 300, y: 542, size: 9.5, font: helveticaBold, color: textColor });
+  page1.drawText('Mme Dalila KHLIFA (Services Techniques & SI)', { x: 300, y: 542, size: 9.5, font: helveticaBold, color: textColor });
   page1.drawText('contact@commune-kalaaseghira.gov.tn', { x: 300, y: 522, size: 9, font: helveticaFont, color: textColor });
   page1.drawText('+216 73 252 022', { x: 300, y: 502, size: 9, font: helveticaFont, color: textColor });
   // Periode
   page1.drawText('01/07/2026', { x: 275, y: 482, size: 9.5, font: helveticaBold, color: textColor });
   page1.drawText('31/08/2026', { x: 390, y: 482, size: 9.5, font: helveticaBold, color: textColor });
   // Cachet mention
-  page1.drawText('Cachet & Signature de l\'encadrant entreprise (Validé)', { x: 120, y: 350, size: 10, font: helveticaBold, color: primaryColor });
+  page1.drawText('Mme Dalila KHLIFA — Encadrante Entreprise (Validé)', { x: 120, y: 350, size: 10, font: helveticaBold, color: primaryColor });
 
   // --- PAGE 2 : Tâches Semaines 1 à 4 ---
   const page2 = pages[1];
   const s1Tasks = [
-    { date: 'Semaine 1 (J1 - J5)', desc: 'Immersion municipalite, entretiens agents techniques, cadrage MoSCoW, planning 8 sem.' },
-    { date: 'Semaine 2 (J6 - J10)', desc: 'Conception UML/MCD, architecture cloud 0 TND, maquettes bilingues FR/AR, repo monorepo & CI.' },
-    { date: 'Semaine 3 (J11 - J15)', desc: 'Migrations SQL, securite RLS, API REST NestJS, upload sans EXIF (INPDP), Swagger & tests.' },
-    { date: 'Semaine 4 (J16 - J20)', desc: 'Front-end PWA React/Vite/Tailwind, Leaflet OSM, GPS, mode hors-ligne. Demo 1 validee.' },
+    { date: 'Semaine 1 (J1 - J5)', desc: 'Immersion à la Mairie de Kalâa Seghira avec Mme Dalila Khlifa, entretiens avec les agents de voirie/propreté, cadrage MoSCoW et planification Scrum.' },
+    { date: 'Semaine 2 (J6 - J10)', desc: 'Spécification des besoins, modélisation UML (Cas d utilisation, classes, séquences), charte UI/UX Pro Max bilingue FR/AR et maquettage responsive.' },
+    { date: 'Semaine 3 (J11 - J15)', desc: 'Architecture backend NestJS modulaire, schémas PostgreSQL Supabase, authentification JWT, contrôle d accès RBAC et tests unitaires Jest.' },
+    { date: 'Semaine 4 (J16 - J20)', desc: 'Développement Frontend React 19 / Vite / Tailwind, cartographie Leaflet OpenStreetMap, géolocalisation GPS et formulaire de signalement citoyen.' },
   ];
 
   let y2 = 720;
@@ -59,10 +59,10 @@ async function fillJournal() {
   // --- PAGE 3 : Tâches Semaines 5 à 8 ---
   const page3 = pages[2];
   const s2Tasks = [
-    { date: 'Semaine 5 (J21 - J25)', desc: 'Dashboard Agent municipal, machine a etats stricte, photo de preuve, emails bilingues avec retry.' },
-    { date: 'Semaine 6 (J26 - J30)', desc: 'Dockerfile multi-stage non-root, Terraform Cloud Run, CI/CD GitHub Actions, tests de charge k6.' },
-    { date: 'Semaine 7 (J31 - J35)', desc: 'Supervision Grafana Cloud, backup SQL + anti-pause Supabase, IA vision Gemini, portail Open Data.' },
-    { date: 'Semaine 8 (J36 - J40)', desc: 'Pilote sur le terrain avec agents, formation 1h, guides FR/AR, rapport de stage & soutenance finale.' },
+    { date: 'Semaine 5 (J21 - J25)', desc: 'Dashboard Agent municipal, machine à états des incidents, gestion des ordres de mission, photo de preuve et historique d audit immuable.' },
+    { date: 'Semaine 6 (J26 - J30)', desc: 'Résolution du bug de persistance BD : écriture atomique disque, sync Supabase, endpoint PATCH /api/reports et modal d édition frontend.' },
+    { date: 'Semaine 7 (J31 - J35)', desc: 'Cloud Engineering & DevSecOps : Docker multi-stage, docker-compose 6 services, pipeline GitHub Actions CI/CD, scan SAST CodeQL et SonarQube.' },
+    { date: 'Semaine 8 (J36 - J40+)', desc: 'Probes Kubernetes (/health/live, ready, db), métriques Prometheus, dashboards Grafana, tests E2E Edge Chromium, rédaction rapport et soutenance.' },
   ];
 
   let y3 = 720;
@@ -81,7 +81,7 @@ async function fillJournal() {
   });
 
   page4.drawText('20 / 20', { x: 520, y: 195, size: 12, font: helveticaBold, color: primaryColor });
-  page4.drawText('Excellent travail d\'ingenierie. Projet complet, livre et deploye avec succes.', {
+  page4.drawText('Travail d ingénierie remarquable de Nada SLAMA. Solution Kalaa Connect complète, fiable, hautement sécurisée et prête pour l exploitation municipale.', {
     x: 320,
     y: 155,
     size: 8.5,

@@ -1,99 +1,127 @@
-# Kalaa Connect — Plateforme Cloud de Signalement Citoyen
+# Kalaa Connect — Plateforme Cloud Municipale de Kalâa Seghira
 
-Plateforme moderne de signalement et de résolution d'anomalies urbaines pour la **Municipalité de Kalâa Seghira (Sousse, Tunisie)**.
+**Plateforme Cloud Intelligente de Signalement Citoyen et de Gestion Territoriale**  
+*Projet de Stage Ingénieur 2ème Année — ESPRIT (École Supérieure Privée d'Ingénierie et de Technologies)*  
+*Année Universitaire : 2025–2026*  
 
-> **Projet de stage ingénieur ESPRIT (4ème $\rightarrow$ 5ème année, Option Cloud)**  
-> **Auteur** : Imed Attia (`@imed`, imedattia1032@gmail.com)  
-> **Durée** : 8 semaines (40 jours ouvrés, J1 à J40)  
-> **Coût cloud cible** : 0 TND (Paliers gratuits uniquement)
+- **Étudiante-Ingénieure** : **Nada SLAMA**  
+- **Encadrante Professionnelle** : **Mme Dalila KHLIFA** (Municipalité de Kalâa Seghira, Gouvernorat de Sousse)  
+- **Établissement** : ESPRIT  
+- **Organisation d'Accueil** : Municipalité de Kalâa Seghira  
 
 ---
 
-## Architecture Globale
+## 🏛️ 1. Présentation du Projet
 
-Le projet est structuré sous forme de monorepo moderne :
+**Kalaa Connect** est une solution cloud moderne et inclusive conçue pour digitaliser la relation citoyen-collectivité au sein de la **Municipalité de Kalâa Seghira**. La plateforme permet aux habitants de signaler en temps réel des dégradations urbaines (voirie, éclairage défectueux, dépôts sauvages d'ordures, espaces verts) et dote les services techniques municipaux d'un outil d'ordonnancement, de gestion d'interventions et de pilotage territorial par la donnée.
 
+```mermaid
+graph LR
+    Citoyen[Citoyen Kalâa Seghira] -->|Signalement Géolocalisé + Photo| Web[Frontend PWA React 19]
+    Web -->|API REST & Auth RBAC| API[Backend NestJS API]
+    API -->|Persistance SQL| Supabase[(PostgreSQL Supabase)]
+    API -->|Secours Atomique| Disk[(Disque Persistant Local)]
+    API -->|Supervision| Prometheus[(Prometheus Metrics)]
+    Prometheus --> Grafana[Tableaux de Bord Grafana]
+    Agent[Agent Technique Municipal] -->|Ordres de Mission & Clôture| Web
 ```
-kalaa-connect/
-├── apps/
-│   ├── api/             # API NestJS (TypeScript, Swagger, Auth JWT, RLS, IA Gemini)
-│   └── web/             # PWA React (Vite, TypeScript, Tailwind, Leaflet OSM, FR/AR bilingue)
-├── packages/
-│   └── shared/          # Types partagés, Enums, Constantes, Machine à états
-├── terraform/           # Infrastructure as Code (Google Cloud Run, Secret Manager, IAM)
-├── .github/workflows/   # CI/CD, Scan de vulnérabilités Trivy, Sauvegarde SQL & Ping
-├── docker-compose.yml   # Orchestration de développement local
-└── README.md
-```
 
 ---
 
-## Fonctionnalités Clés
-
-1. **Espace Citoyen (PWA Mobile-First)** :
-   * Création d'un signalement en moins de 60 secondes avec prise de photo et coordonnées GPS.
-   * Carte interactive Leaflet / OpenStreetMap avec filtres par catégorie et état.
-   * Interface 100 % bilingue **Français et Arabe** (avec disposition RTL).
-   * Mode hors-ligne avec enregistrement local des brouillons de signalement.
-   * Suivi en temps réel de l'avancement de son ticket.
-
-2. **Espace Agent Municipal** :
-   * Tableau de bord des tickets filtrés par service (Voirie, Éclairage, Propreté, Espaces verts).
-   * Gestion du cycle de vie des tickets : *Nouveau $\rightarrow$ Accepté $\rightarrow$ En cours $\rightarrow$ Résolu $\rightarrow$ Clôturé*.
-   * Obligation d'une photo de preuve lors de la résolution.
-   * Traçabilité complète et audit des changements de statut.
-
-3. **Espace Responsable / Administrateur** :
-   * Gestion des services municipaux et des comptes agents.
-   * Visualisation des métriques de performance municipale.
-   * Export des données en CSV.
-
-4. **Bonus IA & Open Data** :
-   * Classification automatique des photos par vision (Google Gemini API) avec score de confiance et explication.
-   * Page publique `/stats` Open Data (sans aucune donnée à caractère personnel) avec répartition par quartier.
-
-5. **Supervision & Fiabilité** :
-   * Endpoint de santé `/health`.
-   * Traçabilité des requêtes via `X-Request-ID`.
-   * Tâche planifiée GitHub Actions (ping de base de données + backup SQL) pour éviter la mise en veille gratuite de Supabase.
-
----
-
-## Installation & Démarrage Rapide
+## 🚀 2. Démarrage Rapide
 
 ### Prérequis
-* Node.js LTS (>= 20)
-* npm (>= 10)
+- Node.js 20+ et npm
+- Docker et Docker Compose (optionnel pour la pile complète)
+- Navigateur moderne (Edge, Chrome, Firefox)
 
-### 1. Installation des dépendances
+### Lancement en Développement Local
 ```bash
+# 1. Cloner le dépôt
+git clone https://github.com/Imed-attia/kalaa-connect.git
+cd kalaa-connect
+
+# 2. Installer les dépendances
 npm install
+
+# 3. Lancer l'API NestJS (port 3000) et le Frontend React Vite (port 5173)
+npm run dev
 ```
 
-### 2. Configuration de l'environnement
-Copier le fichier d'exemple et ajuster les variables nécessaires :
+### Lancement via Docker Compose (Pile Complète)
 ```bash
-cp .env.example .env
+docker compose up -d --build
 ```
-
-### 3. Lancement des applications en développement
-* **Lancer l'API NestJS** :
-  ```bash
-  npm run start:api
-  # Swagger accessible sur http://localhost:3000/api/docs
-  ```
-* **Lancer l'application Web PWA** :
-  ```bash
-  npm run start:web
-  # Application accessible sur http://localhost:5173
-  ```
-
-### 4. Lancer les tests
-```bash
-npm run test
-```
+Services disponibles :
+- **Frontend Web** : `http://localhost:5173` (ou `http://localhost:80` en conteneur)
+- **API NestJS** : `http://localhost:3000/api`
+- **Sonde de Santé** : `http://localhost:3000/api/health/ready`
+- **Métriques Prometheus** : `http://localhost:3000/api/metrics`
+- **Serveur Prometheus** : `http://localhost:9090`
+- **Tableaux de bord Grafana** : `http://localhost:3001`
 
 ---
 
-## Licence
-Ce projet est développé dans le cadre du projet de stage ingénieur ESPRIT. Licence MIT.
+## 🧪 3. Tests & Assurance Qualité (QA)
+
+Le projet intègre une suite de tests rigoureuse couvrant les tests unitaires, d'intégration et les tests d'interface réels sur navigateur :
+
+```bash
+# Exécution de la suite de tests automatisés (31/31 PASS)
+npm test
+
+# Exécution des tests E2E réels sur navigateur Edge Chromium (avec capture d'écran)
+node scripts/e2e-browser-test.js
+```
+
+### Synthèse des Tests Navigateur E2E :
+| N° | Scénario Utilisateur | Statut | Preuve Capturée |
+| :---: | :--- | :---: | :--- |
+| 1 | Chargement Page Accueil & Carte | **PASS** | `docs/screenshots/01_homepage.png` |
+| 2 | Affichage Formulaire Signalement | **PASS** | `docs/screenshots/02_report_form.png` |
+| 3 | Saisie et Validation Formulaire | **PASS** | `docs/screenshots/03_form_filled.png` |
+| 4 | Espace Mes Signalements | **PASS** | `docs/screenshots/04_my_reports.png` |
+| 5 | Modification & Sauvegarde (Fix Defect) | **PASS** | `docs/screenshots/05_edit_saved.png` |
+| 6 | Vérification Persistance après Rechargement (F5) | **PASS** | `docs/screenshots/06_persisted_after_refresh.png` |
+| 7 | Espace Agent Municipal & Ordres de Mission | **PASS** | `docs/screenshots/07_agent_dashboard.png` |
+| 8 | Adaptabilité Mobile & PWA Responsive | **PASS** | `docs/screenshots/08_mobile_responsive.png` |
+
+---
+
+## 📚 4. Dossier Technique Complet (`docs/`)
+
+Retrouvez les spécifications d'ingénierie détaillées dans la documentation du projet :
+
+- [Architecture Système](docs/ARCHITECTURE.md) : Découpage modulaire NestJS, flux de données, composants.
+- [Architecture Cloud](docs/CLOUD_ARCHITECTURE.md) : Modèle multi-cloud hybride, Vercel Edge, conteneurs, PRA/PCA.
+- [Pipeline CI/CD](docs/CI_CD.md) : Workflows GitHub Actions, CodeQL, SonarQube, builds déterministes.
+- [Sécurité & RBAC](docs/SECURITY.md) : Modèle STRIDE, hachage des mots de passe, JWT, protection CSRF/XSS.
+- [Monitoring & Observabilité](docs/MONITORING.md) : Métriques Prometheus, dashboards Grafana, alertes SLI/SLO.
+- [Sondes de Santé](docs/HEALTH_CHECKS.md) : Sondes Liveness, Readiness, Kubernetes & Docker probes.
+- [Base de Données](docs/DATABASE.md) : Investigation du write path, analyse de cause racine du bug d'écriture, schéma SQL.
+- [Déploiement en Production](docs/DEPLOYMENT.md) : Guide de mise en ligne Vercel, Docker, matrice des variables d'environnement.
+- [Runbook Opérationnel](docs/OPERATIONS_RUNBOOK.md) : Procédures de maintenance, sauvegardes, résolutions d'incidents, rollbacks.
+- [Inventaire des Outils](docs/TOOLS_INVENTORY.md) : Catalogue exhaustif des 19 outils et technologies utilisés.
+- [Analyse des Coûts & Compromis](docs/COSTS_AND_TRADEOFFS.md) : Budget TCO (0$ pilote, 50$/mois production), arbitrages d'ingénierie.
+- [Rapport de Tests](docs/TESTING.md) : Résultats des tests E2E avec journal d'exécution.
+
+---
+
+## 👥 5. Comptes de Démonstration & Profils de Test
+
+| Rôle | Nom | Identifiant | Droits & Accès |
+| :--- | :--- | :--- | :--- |
+| **Citoyenne** | Nada SLAMA | `usr-citoyen-nada` | Création et suivi de ses signalements personnels |
+| **Administratrice** | Mme Dalila KHLIFA | `usr-admin-dalila` | Supervision municipale globale, gestion des agents, paramétrage |
+| **Agent de Terrain** | Ali Mansour | `usr-agent-ali` | Prise en charge des interventions (Voirie & Propreté) |
+| **Superviseure** | Salma Ben Amor | `usr-superviseur-salma` | Affectation des équipes et validation des clôtures de tickets |
+
+---
+
+## 📄 6. Livrables Académiques
+
+- **Rapport de Stage 2ème Année** : `RAPPORT_STAGE_2EME_ANNEE_NADA_SLAMA.pdf` & `.docx`
+- **Journal de Stage Rempli** : `journal_stage_4_fr_rempli.pdf` (J1 à J45+)
+- **Présentation de Soutenance Canva** : Projet Canva interactif (20 diapositives, charte graphique ESPRIT et Kalâa Seghira).
+
+*Conçu et développé avec rigueur pour la Municipalité de Kalâa Seghira.*

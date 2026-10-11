@@ -29,8 +29,10 @@
   "author": "Imed Attia <imedattia1032@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "docx": "^9.10.0",
     "pdf-lib": "^1.17.1",
-    "pdf-parse": "^2.4.5"
+    "pdf-parse": "^2.4.5",
+    "puppeteer-core": "^25.13.0"
   },
   "dependencies": {
     "marked": "^18.1.0"
