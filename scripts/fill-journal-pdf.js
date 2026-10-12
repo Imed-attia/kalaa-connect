@@ -35,41 +35,46 @@ async function fillJournal() {
   page1.drawText('contact@commune-kalaaseghira.gov.tn', { x: 300, y: 522, size: 9, font: helveticaFont, color: textColor });
   page1.drawText('+216 73 252 022', { x: 300, y: 502, size: 9, font: helveticaFont, color: textColor });
   // Periode
-  page1.drawText('01/07/2026', { x: 275, y: 482, size: 9.5, font: helveticaBold, color: textColor });
+  page1.drawText('15/06/2026', { x: 275, y: 482, size: 9.5, font: helveticaBold, color: textColor });
   page1.drawText('31/08/2026', { x: 390, y: 482, size: 9.5, font: helveticaBold, color: textColor });
+  // Mention spécialité & année
+  page1.drawText('2ème Année Génie Informatique (Option Cloud) · Année Universitaire 2026 - 2027', { x: 120, y: 450, size: 8.5, font: helveticaBold, color: primaryColor });
   // Cachet mention
-  page1.drawText('Mme Dalila KHLIFA — Encadrante Entreprise (Validé)', { x: 120, y: 350, size: 10, font: helveticaBold, color: primaryColor });
+  page1.drawText('Mme Dalila KHLIFA — Directrice Services Techniques & SI (Validé)', { x: 120, y: 350, size: 9.5, font: helveticaBold, color: primaryColor });
 
-  // --- PAGE 2 : Tâches Semaines 1 à 4 ---
+  // --- PAGE 2 : Tâches Semaines 1 à 5 ---
   const page2 = pages[1];
   const s1Tasks = [
-    { date: 'Semaine 1 (J1 - J5)', desc: 'Immersion à la Mairie de Kalâa Seghira avec Mme Dalila Khlifa, entretiens avec les agents de voirie/propreté, cadrage MoSCoW et planification Scrum.' },
-    { date: 'Semaine 2 (J6 - J10)', desc: 'Spécification des besoins, modélisation UML (Cas d utilisation, classes, séquences), charte UI/UX Pro Max bilingue FR/AR et maquettage responsive.' },
-    { date: 'Semaine 3 (J11 - J15)', desc: 'Architecture backend NestJS modulaire, schémas PostgreSQL Supabase, authentification JWT, contrôle d accès RBAC et tests unitaires Jest.' },
-    { date: 'Semaine 4 (J16 - J20)', desc: 'Développement Frontend React 19 / Vite / Tailwind, cartographie Leaflet OpenStreetMap, géolocalisation GPS et formulaire de signalement citoyen.' },
+    { date: 'S1 (15/06 - 19/06)', desc: 'Immersion Mairie de Kalâa Seghira avec Mme Dalila Khlifa, diagnostic des réclamations (BRC, voirie, propreté), cadrage du projet Kalaa Connect.' },
+    { date: 'S2 (22/06 - 26/06)', desc: 'Recueil des exigences auprès des chefs de service, définition des acteurs (Citoyen, Agent, Admin), matrice MoSCoW et planification Scrum.' },
+    { date: 'S3 (29/06 - 03/07)', desc: 'Modélisation UML (cas d utilisation, séquences, classes) et conception documentaire NoSQL pour Cloud Firestore (Users, Reports, Services).' },
+    { date: 'S4 (06/07 - 10/07)', desc: 'Architecture Cloud GCP/Firebase, charte UI/UX Pro Max bilingue FR/AR (Bleu Azur & Vert Émeraude), initialisation monorepo React 19 / Vite.' },
+    { date: 'S5 (13/07 - 17/07)', desc: 'Authentification Firebase (Google OAuth & Email), contrôle d accès par rôles RBAC (Citoyen, Agent, Directrice SI) et Navbar bilingue.' },
   ];
 
-  let y2 = 720;
+  let y2 = 725;
   s1Tasks.forEach((t) => {
-    page2.drawText(t.date, { x: 60, y: y2, size: 9, font: helveticaBold, color: textColor });
-    page2.drawText(t.desc, { x: 160, y: y2, size: 8.5, font: helveticaFont, color: textColor, maxWidth: 380 });
-    y2 -= 60;
+    page2.drawText(t.date, { x: 50, y: y2, size: 8.5, font: helveticaBold, color: textColor });
+    page2.drawText(t.desc, { x: 155, y: y2, size: 8, font: helveticaFont, color: textColor, maxWidth: 390 });
+    y2 -= 52;
   });
 
-  // --- PAGE 3 : Tâches Semaines 5 à 8 ---
+  // --- PAGE 3 : Tâches Semaines 6 à 11 ---
   const page3 = pages[2];
   const s2Tasks = [
-    { date: 'Semaine 5 (J21 - J25)', desc: 'Dashboard Agent municipal, machine à états des incidents, gestion des ordres de mission, photo de preuve et historique d audit immuable.' },
-    { date: 'Semaine 6 (J26 - J30)', desc: 'Résolution du bug de persistance BD : écriture atomique disque, sync Supabase, endpoint PATCH /api/reports et modal d édition frontend.' },
-    { date: 'Semaine 7 (J31 - J35)', desc: 'Cloud Engineering & DevSecOps : Docker multi-stage, docker-compose 6 services, pipeline GitHub Actions CI/CD, scan SAST CodeQL et SonarQube.' },
-    { date: 'Semaine 8 (J36 - J40+)', desc: 'Probes Kubernetes (/health/live, ready, db), métriques Prometheus, dashboards Grafana, tests E2E Edge Chromium, rédaction rapport et soutenance.' },
+    { date: 'S6 (20/07 - 24/07)', desc: 'Formulaire de signalement citoyen, cartographie Leaflet OpenStreetMap sur Kalâa Seghira, GPS et téléversement photo sécurisé.' },
+    { date: 'S7 (27/07 - 31/07)', desc: 'Espace Mes Tickets et résolution du bug de persistance BD : écriture atomique Firestore, sanitization des undefined et modal d édition (UPDATE).' },
+    { date: 'S8 (03/08 - 07/08)', desc: 'Espace Agent municipal de terrain, machine à états des tickets, photo de preuve obligatoire pour résolution et seed de 20 signalements.' },
+    { date: 'S9 (10/08 - 14/08)', desc: 'Tableau de bord de supervision territoriale pour Mme Dalila Khlifa, calcul des KPIs municipaux et service d export Open Data (JSON/CSV).' },
+    { date: 'S10 (17/08 - 21/08)', desc: 'DevSecOps & CI/CD : Docker multi-stage, pipelines GitHub Actions (CodeQL SAST, Build, Lint) et tests E2E automatisés Puppeteer / Edge.' },
+    { date: 'S11 (24/08 - 31/08)', desc: 'Déploiement Cloud Vercel, tests hors-ligne PWA, recette finale avec Mme Dalila Khlifa, formation agents et rédaction du rapport (25 pages).' },
   ];
 
-  let y3 = 720;
+  let y3 = 730;
   s2Tasks.forEach((t) => {
-    page3.drawText(t.date, { x: 60, y: y3, size: 9, font: helveticaBold, color: textColor });
-    page3.drawText(t.desc, { x: 160, y: y3, size: 8.5, font: helveticaFont, color: textColor, maxWidth: 380 });
-    y3 -= 60;
+    page3.drawText(t.date, { x: 50, y: y3, size: 8.5, font: helveticaBold, color: textColor });
+    page3.drawText(t.desc, { x: 155, y: y3, size: 8, font: helveticaFont, color: textColor, maxWidth: 390 });
+    y3 -= 45;
   });
 
   // --- PAGE 4 : Grille d'évaluation ---
