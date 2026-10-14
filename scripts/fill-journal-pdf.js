@@ -34,12 +34,18 @@ async function fillJournal() {
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
   const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const helveticaOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
 
-  const textColor = rgb(0.08, 0.1, 0.18); // Dark Navy Slate
-  const primaryColor = rgb(0.01, 0.45, 0.72); // Azure Municipal
+  const textColor = rgb(0.12, 0.16, 0.24); // Dark Slate #1E293B
+  const primaryColor = rgb(0.01, 0.45, 0.72); // Azure Municipal #0284C7
+  const darkNavy = rgb(0.06, 0.14, 0.32); // Deep Navy #0F2352
   const greenColor = rgb(0.02, 0.52, 0.28); // Emerald Green
   const white = rgb(1, 1, 1);
   const stampBlue = rgb(0.08, 0.22, 0.45); // Municipal Stamp Blue
+  const tableBorderColor = rgb(0.75, 0.82, 0.90); // Table border soft slate
+  const rowDividerColor = rgb(0.80, 0.86, 0.92); // Week row divider
+  const innerLineColor = rgb(0.90, 0.93, 0.96); // Subtle header line
+  const dateColBg = rgb(0.97, 0.985, 1); // Soft calm tint for date column
 
   const pages = pdfDoc.getPages();
 
@@ -47,7 +53,6 @@ async function fillJournal() {
   // UPDATE FOOTER ON ALL 5 PAGES: "Année Universitaire 2026 - 2027"
   // -------------------------------------------------------------
   pages.forEach((page) => {
-    // cover "Année Universitaire 25/26"
     page.drawRectangle({
       x: 55,
       y: 33,
@@ -175,7 +180,6 @@ async function fillJournal() {
   });
 
   // Cachet et signature box (Page 1)
-  // Draw official Municipal Stamp
   const stampBoxX = 90;
   const stampBoxY = 160;
   const stampBoxW = 415;
@@ -302,379 +306,388 @@ async function fillJournal() {
     color: stampBlue,
   });
 
-  // -------------------------------------------------------------
-  // DATA FOR PAGE 2 (21 ROWS) - Semaines 1 à 5 (J1 à J25)
-  // -------------------------------------------------------------
-  const page2Rows = [
-    // SEMAINE 1 (J1 à J5)
+  // =============================================================
+  // 11 WEEKS / 56 WORKING DAYS (CONCISE, AERATED & CLEAR)
+  // =============================================================
+  const weeksData = [
+    // SEMAINE 1
     {
-      date: '15/06/2026 (J1)',
-      isPair: false,
-      text: 'Accueil officiel à l\'Hôtel de Ville par Mme Dalila KHLIFA. Présentation des départements administratifs et techniques, visite des locaux municipaux et remise du badge de stagiaire ingénieure.'
-    },
-    {
-      date: '16/06/2026 (J2)',
-      isPair: false,
-      text: 'Réunion de cadrage avec Mme Dalila Khlifa. Étude approfondie des processus actuels de gestion des doléances communales : registre papier à l\'accueil, standard téléphonique et courriers physiques.'
-    },
-    {
-      date: '17/06/2026 (J3)',
-      isPair: false,
-      text: 'Immersion au Bureau des Relations avec le Citoyen (BRC). Observation des flux d\'usagers, recensement des réclamations récurrentes et identification des goulets d\'étranglement opérationnels.'
-    },
-    {
-      date: '18/06 - 19/06\n(J4 - J5)',
-      isPair: true,
-      text: 'J4 : Entretiens de terrain avec les chefs des services Voirie, Éclairage public et Propreté urbaine.\nJ5 : Rédaction de la note d\'opportunité et de cadrage. Validation officielle du projet Kalaa Connect.'
+      weekNum: 1,
+      title: "Cadrage, Immersion & Étude de l'Existant",
+      dateRange: "15/06 - 19/06",
+      page: 2,
+      days: [
+        { day: "Lun. 15/06", task: "Accueil officiel à l'Hôtel de Ville par Mme Dalila Khlifa et visite des locaux." },
+        { day: "Mar. 16/06", task: "Analyse du circuit actuel de traitement des doléances communales." },
+        { day: "Mer. 17/06", task: "Immersion au Bureau des Relations avec le Citoyen (BRC) et recueil des besoins." },
+        { day: "Jeu. 18/06", task: "Entretiens de terrain avec les chefs des services Voirie, Éclairage et Propreté." },
+        { day: "Ven. 19/06", task: "Rédaction de la note d'opportunité et validation du projet Kalaa Connect." },
+      ]
     },
 
-    // SEMAINE 2 (J6 à J10)
+    // SEMAINE 2
     {
-      date: '22/06/2026 (J6)',
-      isPair: false,
-      text: 'Identification et caractérisation des trois profils utilisateurs clés de la solution : Citoyens résidents de Kalâa Seghira, Agents d\'intervention de terrain, et Direction SI / Superviseurs municipaux.'
-    },
-    {
-      date: '23/06/2026 (J7)',
-      isPair: false,
-      text: 'Spécification des besoins fonctionnels : signalement géolocalisé avec photo, sélection par quartier communal, machine à états des tickets, suivi en temps réel et tableaux de bord d\'intervention.'
-    },
-    {
-      date: '24/06/2026 (J8)',
-      isPair: false,
-      text: 'Définition des exigences non fonctionnelles : haute disponibilité Cloud (99.9%), temps de réponse inférieur à 2s, résilience hors-ligne PWA et interface bilingue arabe/français accessible.'
-    },
-    {
-      date: '25/06 - 26/06\n(J9 - J10)',
-      isPair: true,
-      text: 'J9 : Priorisation du Product Backlog selon la méthode MoSCoW en concertation avec Mme Dalila Khlifa.\nJ10 : Définition du cadre méthodologique Agile Scrum (Sprints de 2 semaines) et validation du cahier des charges.'
+      weekNum: 2,
+      title: "Spécification des Besoins & Backlog Agile",
+      dateRange: "22/06 - 26/06",
+      page: 2,
+      days: [
+        { day: "Lun. 22/06", task: "Modélisation des acteurs clés : Citoyen, Agent de terrain et Direction SI." },
+        { day: "Mar. 23/06", task: "Spécification fonctionnelle : signalement géolocalisé, photo et suivi en direct." },
+        { day: "Mer. 24/06", task: "Exigences non fonctionnelles : haute disponibilité, temps de réponse < 2s, PWA." },
+        { day: "Jeu. 25/06", task: "Rédaction et hiérarchisation du Product Backlog selon la méthode MoSCoW." },
+        { day: "Ven. 26/06", task: "Découpage en 3 Sprints Agile Scrum et validation du cahier des charges." },
+      ]
     },
 
-    // SEMAINE 3 (J11 à J15)
+    // SEMAINE 3
     {
-      date: '29/06/2026 (J11)',
-      isPair: false,
-      text: 'Élaboration du diagramme global des cas d\'utilisation UML représentant les interactions fonctionnelles pour chaque acteur (Citoyen, Agent technique, Directrice SI).'
-    },
-    {
-      date: '30/06/2026 (J12)',
-      isPair: false,
-      text: 'Modélisation dynamique : conception des diagrammes de séquence UML pour l\'authentification, le signalement citoyen géolocalisé et la prise en charge/résolution par les agents.'
-    },
-    {
-      date: '01/07/2026 (J13)',
-      isPair: false,
-      text: 'Modélisation des données : diagramme de classes UML et conception du modèle documentaire NoSQL pour Cloud Firestore (collections Users, Reports, Services, AuditLogs).'
-    },
-    {
-      date: '02/07 - 03/07\n(J14 - J15)',
-      isPair: true,
-      text: 'J14 : Modélisation formelle de la machine à états des tickets (Nouveau -> Pris en charge -> En cours -> Résolu -> Clôturé).\nJ15 : Revue de conception technique avec Mme Dalila Khlifa et validation formelle de l\'architecture.'
+      weekNum: 3,
+      title: "Conception UML & Schéma Documentaire NoSQL",
+      dateRange: "29/06 - 03/07",
+      page: 2,
+      days: [
+        { day: "Lun. 29/06", task: "Élaboration du diagramme global des cas d'utilisation UML de la plateforme." },
+        { day: "Mar. 30/06", task: "Modélisation des diagrammes de séquence (authentification, signalement)." },
+        { day: "Mer. 01/07", task: "Conception du modèle de données documentaire NoSQL sous Cloud Firestore." },
+        { day: "Jeu. 02/07", task: "Modélisation de la machine à états des tickets d'intervention municipaux." },
+        { day: "Ven. 03/07", task: "Revue de conception technique avec l'encadrante et validation architecturale." },
+      ]
     },
 
-    // SEMAINE 4 (J16 à J20)
+    // SEMAINE 4
     {
-      date: '06/07/2026 (J16)',
-      isPair: false,
-      text: 'Étude comparative et sélection de l\'écosystème Cloud : choix de Google Cloud Platform (GCP) & Firebase pour sa résilience serverless, son coût d\'exploitation optimisé (0 TND) et sa scalabilité.'
-    },
-    {
-      date: '07/07/2026 (J17)',
-      isPair: false,
-      text: 'Définition de l\'architecture logicielle : Single Page Application (SPA) React 19 / TypeScript / Vite, connectée en direct à Firestore avec moteur de repli local (Dual-Write persistant).'
-    },
-    {
-      date: '08/07/2026 (J18)',
-      isPair: false,
-      text: 'Application de la compétence UI/UX Pro Max : élaboration de la charte graphique Smart City (Bleu Azur Municipal #0284C7, Vert Émeraude #059669, typographie Plus Jakarta Sans bilingue FR/AR).'
-    },
-    {
-      date: '09/07 - 10/07\n(J19 - J20)',
-      isPair: true,
-      text: 'J19 : Prototypage haute fidélité sous Figma & Canva (carte interactive, modale d\'authentification, formulaires).\nJ20 : Initialisation du monorepo npm, configuration Vite, Tailwind CSS, dépôt GitHub nadaslama23/kalaa-connect.'
+      weekNum: 4,
+      title: "Architecture Cloud Serverless & Prototypage UI/UX",
+      dateRange: "06/07 - 10/07",
+      page: 2,
+      days: [
+        { day: "Lun. 06/07", task: "Benchmark Cloud : sélection de GCP, Firebase et Vercel Edge Serverless." },
+        { day: "Mar. 07/07", task: "Définition de l'architecture logicielle SPA React 19 / TypeScript / Vite." },
+        { day: "Mer. 08/07", task: "Charte graphique Smart City UI/UX Pro Max : palette azur et bilinguisme FR/AR." },
+        { day: "Jeu. 09/07", task: "Prototypage interactif haute fidélité sous Figma (carte, formulaire, métriques)." },
+        { day: "Ven. 10/07", task: "Initialisation du monorepo npm, configuration Vite, Tailwind CSS et GitHub." },
+      ]
     },
 
-    // SEMAINE 5 (J21 à J25)
+    // SEMAINE 5
     {
-      date: '13/07/2026 (J21)',
-      isPair: false,
-      text: 'Création et configuration du projet Firebase kalaa-sghira sur Google Cloud : provisionnement de Firebase Authentication et de la base de données Cloud Firestore en région eur3.'
+      weekNum: 5,
+      title: "Configuration Firebase & Authentification RBAC",
+      dateRange: "13/07 - 17/07",
+      page: 2,
+      days: [
+        { day: "Lun. 13/07", task: "Création du projet Firebase kalaa-sghira sur GCP (Firestore & Storage eur3)." },
+        { day: "Mar. 14/07", task: "Intégration de Firebase Auth et connexion Google OAuth 2.0 sécurisée." },
+        { day: "Mer. 15/07", task: "Développement du module d'authentification e-mail/mot de passe et sessions." },
+        { day: "Jeu. 16/07", task: "Mise en place du contrôle d'accès RBAC (Citoyen, Agent technique, Superviseur)." },
+        { day: "Ven. 17/07", task: "Développement de la barre de navigation Navbar.tsx avec statut Cloud temps réel." },
+      ]
     },
+
+    // SEMAINE 6 -> PAGE 3
     {
-      date: '14/07/2026 (J22)',
-      isPair: false,
-      text: 'Intégration du SDK Web Firebase (firebase/auth) et implémentation du fournisseur Google OAuth 2.0 via pop-up sécurisée avec extraction du profil utilisateur.'
+      weekNum: 6,
+      title: "Cartographie Interactive & Formulaire Citoyen",
+      dateRange: "20/07 - 24/07",
+      page: 3,
+      days: [
+        { day: "Lun. 20/07", task: "Intégration de Leaflet OpenStreetMap centrée sur le territoire communal." },
+        { day: "Mar. 21/07", task: "Géolocalisation GPS HTML5, marqueur draggable et sélecteur de quartiers." },
+        { day: "Mer. 22/07", task: "Développement du formulaire citoyen de signalement par catégorie d'incident." },
+        { day: "Jeu. 23/07", task: "Module de téléversement photo avec compression client et prévisualisation." },
+        { day: "Ven. 24/07", task: "Raccordement Firestore, génération du ticket KC-2026 et démo Sprint 1." },
+      ]
     },
+
+    // SEMAINE 7 -> PAGE 3
     {
-      date: '15/07/2026 (J23)',
-      isPair: false,
-      text: 'Développement du système d\'authentification native par e-mail et mot de passe, formulaire d\'inscription/connexion et mise en place de l\'écouteur persistant onAuthStateChanged.'
+      weekNum: 7,
+      title: "Espace Citoyen & Résolution Bug Firestore",
+      dateRange: "27/07 - 31/07",
+      page: 3,
+      days: [
+        { day: "Lun. 27/07", task: "Développement de l'espace « Mes Tickets » avec suivi des statuts en direct." },
+        { day: "Mar. 28/07", task: "Diagnostic du bug critique Firestore lié aux clés undefined dans les payloads." },
+        { day: "Mer. 29/07", task: "Résolution avec removeUndefined() récursif et fiabilisation de updateDoc()." },
+        { day: "Jeu. 30/07", task: "Développement de la modale d'édition interactive (UPDATE) et annulation." },
+        { day: "Ven. 31/07", task: "Tests complets du cycle création/mise à jour et validation avec l'encadrante." },
+      ]
     },
+
+    // SEMAINE 8 -> PAGE 3
     {
-      date: '16/07/2026 (J24)',
-      isPair: false,
-      text: 'Implémentation du contrôle d\'accès basé sur les rôles (RBAC) : différenciation stricte des autorisations entre Citoyen (CITOYEN), Agent de terrain (AGENT) et Direction SI (ADMIN).'
+      weekNum: 8,
+      title: "Espace Agent Mobile & Gestion du Terrain",
+      dateRange: "03/08 - 07/08",
+      page: 3,
+      days: [
+        { day: "Lun. 03/08", task: "Développement du dashboard mobile tactile pour les agents communaux." },
+        { day: "Mar. 04/08", task: "Filtrage des interventions par service (Voirie, Éclairage, Propreté) et prise en charge." },
+        { day: "Mer. 05/08", task: "Statut « Résolu » avec obligation de téléverser la photo de preuve après travaux." },
+        { day: "Jeu. 06/08", task: "Notification citoyenne de résolution et mécanisme de clôture définitive." },
+        { day: "Ven. 07/08", task: "Ensemencement Firestore avec 20 signalements réels et démo Sprint 2." },
+      ]
     },
+
+    // SEMAINE 9 -> PAGE 3
     {
-      date: '17/07/2026 (J25)',
-      isPair: false,
-      text: 'Développement de la barre de navigation Navbar.tsx bilingue FR/AR avec indicateur de connectivité Cloud en temps réel, profil connecté et raccourcis de démonstration rapide.'
+      weekNum: 9,
+      title: "Tableaux de Bord Décisionnels & Open Data",
+      dateRange: "10/08 - 14/08",
+      page: 3,
+      days: [
+        { day: "Lun. 10/08", task: "Conception du dashboard de supervision pour la Direction des Services Techniques." },
+        { day: "Mar. 11/08", task: "Calcul automatique des KPIs : taux de résolution et délais moyens de traitement." },
+        { day: "Mer. 12/08", task: "Graphiques analytiques interactifs et répartition des pannes par quartier." },
+        { day: "Jeu. 13/08", task: "Développement de l'exportation Open Data aux formats JSON et CSV pour la mairie." },
+        { day: "Ven. 14/08", task: "Revue de Sprint 3 et validation des indicateurs de pilotage avec l'encadrante." },
+      ]
     },
+
+    // SEMAINE 10 -> PAGE 3
+    {
+      weekNum: 10,
+      title: "Conteneurisation, DevSecOps & CI/CD",
+      dateRange: "17/08 - 21/08",
+      page: 3,
+      days: [
+        { day: "Lun. 17/08", task: "Conteneurisation Docker multi-stage de production avec serveur Nginx léger." },
+        { day: "Mar. 18/08", task: "Pipeline CI GitHub Actions : automatisation de la compilation tsc et ESLint." },
+        { day: "Mer. 19/08", task: "Sécurité DevSecOps : audit npm audit, scan SAST CodeQL et détection de secrets." },
+        { day: "Jeu. 20/08", task: "Rédaction des suites de tests E2E automatisés sous Puppeteer / Edge." },
+        { day: "Ven. 21/08", task: "Validation des 3 workflows CI/CD sur GitHub avec statut vert (100% SUCCESS)." },
+      ]
+    },
+
+    // SEMAINE 11 -> PAGE 3 (6 JOURS)
+    {
+      weekNum: 11,
+      title: "Déploiement Cloud Edge, Recette & Clôture",
+      dateRange: "24/08 - 31/08",
+      page: 3,
+      days: [
+        { day: "Lun. 24/08", task: "Déploiement en production sur Vercel Edge Network avec certificat SSL/TLS." },
+        { day: "Mar. 25/08", task: "Tests de charge et validation de la résilience hors-ligne Progressive Web App." },
+        { day: "Mer. 26/08", task: "Séance de recette finale avec Mme Dalila Khlifa et simulation sur le terrain." },
+        { day: "Jeu. 27/08", task: "Formation des agents techniques communaux et remise du guide d'utilisation." },
+        { day: "Ven. 28/08", task: "Finalisation de la rédaction du rapport académique de stage (25 pages)." },
+        { day: "Lun. 31/08", task: "Bilan final du stage avec l'encadrante, signature du journal et validation (20/20)." },
+      ]
+    }
   ];
 
+  // =============================================================
+  // CLEAN & AERATED WEEK-BY-WEEK RENDERER
+  // =============================================================
+  const tableX = 56.5;
+  const tableW = 482.0;
+  const colDateW = 92.0;
+  const colTasksX = tableX + colDateW; // 148.5
+  const colTasksW = tableW - colDateW; // 390.0
+
+  function renderAeratedTable(targetPage, weeksForPage, startY, endY, rowHeights, fontSizeDay, fontSizeText, lineSpacing) {
+    const totalH = startY - endY;
+
+    // 1. Wipe out existing pre-printed table body with clean white
+    targetPage.drawRectangle({
+      x: tableX,
+      y: endY,
+      width: tableW,
+      height: totalH,
+      color: white,
+    });
+
+    // 2. Outer border
+    targetPage.drawRectangle({
+      x: tableX,
+      y: endY,
+      width: tableW,
+      height: totalH,
+      borderColor: tableBorderColor,
+      borderWidth: 1,
+    });
+
+    // 3. Vertical divider between Date and Tasks
+    targetPage.drawLine({
+      start: { x: colTasksX, y: startY },
+      end: { x: colTasksX, y: endY },
+      color: tableBorderColor,
+      thickness: 0.8,
+    });
+
+    let currentY = startY;
+
+    weeksForPage.forEach((week, wIdx) => {
+      const rowH = rowHeights[wIdx];
+      const rowTopY = currentY;
+      const rowBottomY = rowTopY - rowH;
+
+      // Soft alternating background for the Date Column to anchor the week
+      targetPage.drawRectangle({
+        x: tableX + 0.5,
+        y: rowBottomY + 0.5,
+        width: colDateW - 1,
+        height: rowH - 1,
+        color: dateColBg,
+      });
+
+      // Accent color pill on the left of each week row
+      targetPage.drawRectangle({
+        x: tableX + 0.5,
+        y: rowBottomY + 0.5,
+        width: 3.5,
+        height: rowH - 1,
+        color: primaryColor,
+      });
+
+      // DATE COLUMN CONTENT (Vertically centered)
+      const numDays = week.days.length;
+      const dateBlockH = 34; // approximate height of week badge block
+      const dateBlockTopY = rowTopY - (rowH - dateBlockH) / 2;
+
+      // Week Label (e.g. "SEMAINE 1")
+      targetPage.drawText(`SEMAINE ${week.weekNum}`, {
+        x: tableX + 11,
+        y: dateBlockTopY - 10,
+        size: 9.2,
+        font: helveticaBold,
+        color: darkNavy,
+      });
+
+      // Date Range (e.g. "15/06 - 19/06")
+      targetPage.drawText(week.dateRange, {
+        x: tableX + 11,
+        y: dateBlockTopY - 21,
+        size: 7.8,
+        font: helveticaBold,
+        color: primaryColor,
+      });
+
+      // Days count badge (e.g. "(5 jours ouvrés)")
+      targetPage.drawText(`(${numDays} jours ouvrés)`, {
+        x: tableX + 11,
+        y: dateBlockTopY - 31,
+        size: 6.8,
+        font: helveticaOblique,
+        color: rgb(0.40, 0.48, 0.58),
+      });
+
+      // TÂCHES COLUMN CONTENT
+      // Week Theme Title Header
+      const contentPaddingTop = (rowH - (16 + numDays * lineSpacing)) / 2;
+      const themeTitleY = rowTopY - Math.max(contentPaddingTop, 8) - 9;
+
+      targetPage.drawText(week.title, {
+        x: colTasksX + 10,
+        y: themeTitleY,
+        size: 8.5,
+        font: helveticaBold,
+        color: darkNavy,
+      });
+
+      // Subtle thin underline under the theme title
+      targetPage.drawLine({
+        start: { x: colTasksX + 10, y: themeTitleY - 3 },
+        end: { x: tableX + tableW - 12, y: themeTitleY - 3 },
+        color: innerLineColor,
+        thickness: 0.6,
+      });
+
+      // Days bullet points
+      let bulletY = themeTitleY - 13;
+
+      week.days.forEach((dayItem) => {
+        // Bullet symbol
+        targetPage.drawText('•', {
+          x: colTasksX + 10,
+          y: bulletY,
+          size: fontSizeDay + 1,
+          font: helveticaBold,
+          color: primaryColor,
+        });
+
+        // Day label (e.g. "Lun. 15/06 :")
+        const dayLabel = `${dayItem.day} : `;
+        targetPage.drawText(dayLabel, {
+          x: colTasksX + 18,
+          y: bulletY,
+          size: fontSizeDay,
+          font: helveticaBold,
+          color: darkNavy,
+        });
+
+        // Task description (regular font, perfectly aligned)
+        const dayLabelWidth = helveticaBold.widthOfTextAtSize(dayLabel, fontSizeDay);
+        targetPage.drawText(dayItem.task, {
+          x: colTasksX + 18 + dayLabelWidth,
+          y: bulletY,
+          size: fontSizeText,
+          font: helvetica,
+          color: textColor,
+        });
+
+        bulletY -= lineSpacing;
+      });
+
+      // Horizontal week divider line
+      if (wIdx < weeksForPage.length - 1) {
+        targetPage.drawLine({
+          start: { x: tableX, y: rowBottomY },
+          end: { x: tableX + tableW, y: rowBottomY },
+          color: rowDividerColor,
+          thickness: 0.8,
+        });
+      }
+
+      currentY = rowBottomY;
+    });
+  }
+
   // -------------------------------------------------------------
-  // DATA FOR PAGE 3 (22 ROWS) - Semaines 6 à 11 (J26 à J56)
-  // -------------------------------------------------------------
-  const page3Rows = [
-    // SEMAINE 6 (J26 à J30)
-    {
-      date: '20/07/2026 (J26)',
-      isPair: false,
-      text: 'Intégration de la cartographie Leaflet OpenStreetMap centrée avec précision sur le territoire communal de Kalâa Seghira (35.8285° N, 10.5640° E) avec tuiles cartographiques réactives.'
-    },
-    {
-      date: '21/07/2026 (J27)',
-      isPair: false,
-      text: 'Implémentation du module de géolocalisation HTML5 (navigator.geolocation) avec placement automatique du marqueur et sélection assistée par quartier communal (El Manar, Bassatine, etc.).'
-    },
-    {
-      date: '22/07/2026 (J28)',
-      isPair: false,
-      text: 'Développement du formulaire citoyen CitizenReportForm.tsx avec sélection visuelle par pictogrammes de la catégorie d\'anomalie (Voirie, Éclairage, Propreté, Espaces verts, Bâtiments).'
-    },
-    {
-      date: '23/07 - 24/07\n(J29 - J30)',
-      isPair: true,
-      text: 'J29 : Intégration du téléversement photo avec contrôle strict du poids (max 2 Mo) et galerie d\'exemples réels.\nJ30 : Raccordement Firestore, génération du ticket normalisé (KC-2026-XXXX) et démonstration Revue Sprint 1.'
-    },
-
-    // SEMAINE 7 (J31 à J35)
-    {
-      date: '27/07/2026 (J31)',
-      isPair: false,
-      text: 'Développement de l\'interface « Mes Tickets » (MyReportsView.tsx) permettant au citoyen de suivre en direct l\'historique et l\'état d\'avancement de ses signalements municipaux.'
-    },
-    {
-      date: '28/07/2026 (J32)',
-      isPair: false,
-      text: 'Investigation approfondie du bug critique de persistance en base de données : diagnostic des rejets d\'écriture Firestore provoqués par la présence de clés undefined dans les payloads d\'édition.'
-    },
-    {
-      date: '29/07/2026 (J33)',
-      isPair: false,
-      text: 'Résolution définitive du bug : implémentation de la fonction récursive de nettoyage removeUndefined(), fiabilisation des écritures atomiques updateDoc() et synchronisation du cache local.'
-    },
-    {
-      date: '30/07 - 31/07\n(J34 - J35)',
-      isPair: true,
-      text: 'J34 : Développement de la modale d\'édition interactive (UPDATE) permettant de modifier titre, description et priorité.\nJ35 : Tests de validation interactifs du cycle Création + Modification et revue de Sprint 2 avec l\'encadrante.'
-    },
-
-    // SEMAINE 8 (J36 à J40)
-    {
-      date: '03/08/2026 (J36)',
-      isPair: false,
-      text: 'Conception et développement de l\'espace mobile AgentDashboard.tsx dédié aux équipes techniques communales d\'intervention sur le terrain avec interface tactile optimisée.'
-    },
-    {
-      date: '04/08/2026 (J37)',
-      isPair: false,
-      text: 'Implémentation du filtrage par service technique (Voirie, Éclairage, Propreté) et fonction de prise en charge d\'un ordre d\'intervention avec assignation d\'agent.'
-    },
-    {
-      date: '05/08/2026 (J38)',
-      isPair: false,
-      text: 'Implémentation de la machine à états des tickets : passage au statut « Résolu » avec obligation de téléversement d\'une photo de preuve des travaux achevés avant validation.'
-    },
-    {
-      date: '06/08 - 07/08\n(J39 - J40)',
-      isPair: true,
-      text: 'J39 : Implémentation du mécanisme de clôture citoyenne et de notification de confirmation de résolution.\nJ40 : Ensemencement de Cloud Firestore avec 20 signalements authentiques couvrant Kalâa Seghira. Revue Sprint 2.'
-    },
-
-    // SEMAINE 9 (J41 à J45)
-    {
-      date: '10/08/2026 (J41)',
-      isPair: false,
-      text: 'Conception du tableau de bord de supervision territoriale OpenDataStatsView.tsx destiné à Mme Dalila KHLIFA et aux chefs de services municipaux.'
-    },
-    {
-      date: '11/08/2026 (J42)',
-      isPair: false,
-      text: 'Implémentation des indicateurs de performance clés (KPIs) : taux de résolution global, délai moyen d\'intervention en heures, répartition des pannes par secteur communal.'
-    },
-    {
-      date: '12/08/2026 (J43)',
-      isPair: false,
-      text: 'Génération dynamique des visualisations graphiques et cartographiques des incidents urbains par quartier communal (El Manar, Bassatine, Cité Nouvelle, Centre-Ville).'
-    },
-    {
-      date: '13/08 - 14/08\n(J44 - J45)',
-      isPair: true,
-      text: 'J44 : Développement du service d\'exportation Open Data aux formats JSON et CSV pour la gouvernance ouverte.\nJ45 : Revue de Sprint 3 et validation des tableaux de bord décisionnels par Mme Dalila Khlifa.'
-    },
-
-    // SEMAINE 10 (J46 à J50)
-    {
-      date: '17/08/2026 (J46)',
-      isPair: false,
-      text: 'Conteneurisation Docker de la solution : rédaction du Dockerfile multi-stage optimisé pour la production avec serveur Nginx léger et du fichier d\'orchestration docker-compose.yml.'
-    },
-    {
-      date: '18/08 - 19/08\n(J47 - J48)',
-      isPair: true,
-      text: 'J47 : Chaîne CI GitHub Actions : vérification TypeScript strict (tsc), linting ESLint et build de production.\nJ48 : Sécurité DevSecOps : intégration de l\'analyse statique SAST GitHub CodeQL et audit rigoureux des secrets.'
-    },
-    {
-      date: '20/08 - 21/08\n(J49 - J50)',
-      isPair: true,
-      text: 'J49 : Écriture de la suite de tests E2E automatisés Puppeteer / Edge (Auth, Signalement, Édition UPDATE).\nJ50 : Exécution et validation des 3 workflows CI/CD sur GitHub (statut 100% vert / SUCCESS sur nadaslama23/kalaa-connect).'
-    },
-
-    // SEMAINE 11 (J51 à J56)
-    {
-      date: '24/08 - 25/08\n(J51 - J52)',
-      isPair: true,
-      text: 'J51 : Déploiement en production sur la plateforme Cloud Edge Vercel avec connexion sécurisée à Cloud Firestore.\nJ52 : Tests de charge et de résilience hors-ligne PWA : validation de la synchronisation automatique en reconnexion.'
-    },
-    {
-      date: '26/08 - 27/08\n(J53 - J54)',
-      isPair: true,
-      text: 'J53 : Séance de recette finale utilisateur en présence de Mme Dalila Khlifa avec simulation de pannes sur le terrain.\nJ54 : Formation des agents municipaux à l\'outil mobile et remise du guide d\'exploitation simplifié.'
-    },
-    {
-      date: '28/08 - 31/08\n(J55 - J56)',
-      isPair: true,
-      text: 'J55 : Rédaction et finalisation du rapport académique de stage de perfectionnement (25 pages) selon les normes ESPRIT.\nJ56 : Bilan final avec Mme Dalila Khlifa, signature du journal de stage (20/20) et clôture officielle du stage.'
-    },
-  ];
-
-  // -------------------------------------------------------------
-  // RENDER PAGE 2 (21 ROWS)
-  // Row top borders from 736.1 down to 74.4 with 31.5 pt interval
+  // RENDER PAGE 2 : SEMAINES 1 À 5 (5 SEMAINES ÉQUILIBRÉES)
+  // Available height: 736.1 - 76.1 = 660 pt -> 132 pt per week!
   // -------------------------------------------------------------
   const page2 = pages[1];
-  const page2RowTops = [
-    736.1, 704.5, 673.1, 641.5, 610.1, 578.5, 547.0, 515.5, 484.0, 452.5,
-    421.0, 389.5, 358.0, 326.5, 295.0, 263.5, 232.0, 200.4, 169.0, 137.4, 106.0
-  ];
+  const page2Weeks = weeksData.filter((w) => w.page === 2);
+  const page2RowHeights = [132, 132, 132, 132, 132];
 
-  page2Rows.forEach((row, idx) => {
-    const topY = page2RowTops[idx];
-    const rowH = 31.5;
-    const dateY = topY - 14;
-
-    // Date column
-    if (row.isPair) {
-      const dateLines = row.date.split('\n');
-      page2.drawText(dateLines[0], {
-        x: 60,
-        y: topY - 12,
-        size: 7.2,
-        font: helveticaBold,
-        color: textColor,
-      });
-      page2.drawText(dateLines[1], {
-        x: 60,
-        y: topY - 22,
-        size: 6.8,
-        font: helveticaBold,
-        color: primaryColor,
-      });
-    } else {
-      page2.drawText(row.date, {
-        x: 60,
-        y: dateY,
-        size: 7.2,
-        font: helveticaBold,
-        color: textColor,
-      });
-    }
-
-    // Tâches column (x = 152, width = 382)
-    const textLines = row.text.split('\n');
-    let textY = topY - 10;
-    textLines.forEach((tLine) => {
-      const wrapped = wrapText(tLine, 382, helvetica, 6.7);
-      wrapped.forEach((wLine) => {
-        page2.drawText(wLine, {
-          x: 152,
-          y: textY,
-          size: 6.7,
-          font: helvetica,
-          color: textColor,
-        });
-        textY -= 8.2;
-      });
-    });
-  });
+  renderAeratedTable(
+    page2,
+    page2Weeks,
+    736.1, // startY
+    76.1,  // endY
+    page2RowHeights,
+    7.3,   // fontSizeDay
+    7.0,   // fontSizeText
+    14.5   // lineSpacing (very comfortable!)
+  );
 
   // -------------------------------------------------------------
-  // RENDER PAGE 3 (22 ROWS)
-  // Row top borders from 765.2 down to 72.1 with 31.5 pt interval
+  // RENDER PAGE 3 : SEMAINES 6 À 11 (6 SEMAINES ÉQUILIBRÉES)
+  // Available height: 765.2 - 73.7 = 691.5 pt
+  // 5 weeks * 114 pt + 1 week (6 days) * 121.5 pt = 691.5 pt!
   // -------------------------------------------------------------
   const page3 = pages[2];
-  const page3RowTops = [
-    765.2, 733.7, 702.2, 670.7, 639.2, 607.7, 576.2, 544.6, 513.2, 481.6,
-    450.2, 418.6, 387.2, 355.6, 324.2, 292.6, 261.2, 229.6, 198.1, 166.6, 135.1, 103.6
-  ];
+  const page3Weeks = weeksData.filter((w) => w.page === 3);
+  const page3RowHeights = [114, 114, 114, 114, 114, 121.5];
 
-  page3Rows.forEach((row, idx) => {
-    const topY = page3RowTops[idx];
-    const rowH = 31.5;
-    const dateY = topY - 14;
-
-    // Date column
-    if (row.isPair) {
-      const dateLines = row.date.split('\n');
-      page3.drawText(dateLines[0], {
-        x: 60,
-        y: topY - 12,
-        size: 7.2,
-        font: helveticaBold,
-        color: textColor,
-      });
-      page3.drawText(dateLines[1], {
-        x: 60,
-        y: topY - 22,
-        size: 6.8,
-        font: helveticaBold,
-        color: primaryColor,
-      });
-    } else {
-      page3.drawText(row.date, {
-        x: 60,
-        y: dateY,
-        size: 7.2,
-        font: helveticaBold,
-        color: textColor,
-      });
-    }
-
-    // Tâches column (x = 152, width = 382)
-    const textLines = row.text.split('\n');
-    let textY = topY - 10;
-    textLines.forEach((tLine) => {
-      const wrapped = wrapText(tLine, 382, helvetica, 6.7);
-      wrapped.forEach((wLine) => {
-        page3.drawText(wLine, {
-          x: 152,
-          y: textY,
-          size: 6.7,
-          font: helvetica,
-          color: textColor,
-        });
-        textY -= 8.2;
-      });
-    });
-  });
+  renderAeratedTable(
+    page3,
+    page3Weeks,
+    765.2, // startY
+    73.7,  // endY
+    page3RowHeights,
+    7.0,   // fontSizeDay
+    6.7,   // fontSizeText
+    12.2   // lineSpacing
+  );
 
   // -------------------------------------------------------------
   // PAGE 4 : GRILLE D'ÉVALUATION CRITÉRIÉE
   // -------------------------------------------------------------
   const page4 = pages[3];
 
-  // Coordinates of each of the 11 criteria rows (center Y)
   const critY = [
     605, // 1. Motivation
     571, // 2. Esprit d'initiative
@@ -690,7 +703,7 @@ async function fillJournal() {
   ];
 
   critY.forEach((y) => {
-    // Checkmark in "Excellent (4)" column: place cleanly in right margin (x = 522)
+    // Checkmark in "Excellent (4)" column
     page4.drawText('X', {
       x: 522,
       y: y - 2,
@@ -698,7 +711,7 @@ async function fillJournal() {
       font: helveticaBold,
       color: stampBlue,
     });
-    // Note in "Note (1-4)" column (x ~ 552)
+    // Note in "Note (1-4)" column
     page4.drawText('4', {
       x: 552,
       y: y - 2,
@@ -708,7 +721,7 @@ async function fillJournal() {
     });
   });
 
-  // Note finale : cover ".... /20" with clean white and write "20 / 20"
+  // Note finale : 20 / 20
   page4.drawRectangle({
     x: 480,
     y: 210,
@@ -724,7 +737,7 @@ async function fillJournal() {
     color: greenColor,
   });
 
-  // Remarques de l'encadrante (x from 304 to 540, y from 182 down to 75)
+  // Remarques de l'encadrante
   const appreciationText =
     "Mademoiselle Nada SLAMA a réalisé un travail d'ingénierie d'une qualité exceptionnelle au sein de notre Direction des Services Techniques et Informatiques de la Municipalité de Kalâa Seghira. Elle a fait preuve d'une maturité technique remarquable, d'une grande rigueur scientifique et d'un sens aigu du service public. La plateforme Kalaa Connect qu'elle a conçue, développée et déployée répond parfaitement aux besoins de modernisation de notre commune et constitue un outil précieux pour nos équipes de terrain. Nous recommandons chaleureusement son travail avec la note maximale de 20/20 et les félicitations de notre direction.";
 
@@ -741,7 +754,7 @@ async function fillJournal() {
     appY -= 9;
   });
 
-  // Cachet et signature box (x from 40 to 290, y from 185 down to 75)
+  // Cachet et signature box
   const stampP4X = 42;
   const stampP4Y = 75;
   const stampP4W = 250;
