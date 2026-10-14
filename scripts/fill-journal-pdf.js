@@ -646,17 +646,17 @@ async function fillJournal() {
 
   // -------------------------------------------------------------
   // RENDER PAGE 2 : SEMAINES 1 À 5 (5 SEMAINES ÉQUILIBRÉES)
-  // Available height: 736.1 - 76.1 = 660 pt -> 132 pt per week!
+  // Available height: 736.1 - 74.5 = 661.6 pt
   // -------------------------------------------------------------
   const page2 = pages[1];
   const page2Weeks = weeksData.filter((w) => w.page === 2);
-  const page2RowHeights = [132, 132, 132, 132, 132];
+  const page2RowHeights = [132.3, 132.3, 132.3, 132.3, 132.4];
 
   renderAeratedTable(
     page2,
     page2Weeks,
     736.1, // startY
-    76.1,  // endY
+    74.5,  // endY
     page2RowHeights,
     7.3,   // fontSizeDay
     7.0,   // fontSizeText
@@ -665,18 +665,17 @@ async function fillJournal() {
 
   // -------------------------------------------------------------
   // RENDER PAGE 3 : SEMAINES 6 À 11 (6 SEMAINES ÉQUILIBRÉES)
-  // Available height: 765.2 - 73.7 = 691.5 pt
-  // 5 weeks * 114 pt + 1 week (6 days) * 121.5 pt = 691.5 pt!
+  // Available height: 765.2 - 72.1 = 693.1 pt
   // -------------------------------------------------------------
   const page3 = pages[2];
   const page3Weeks = weeksData.filter((w) => w.page === 3);
-  const page3RowHeights = [114, 114, 114, 114, 114, 121.5];
+  const page3RowHeights = [114.2, 114.2, 114.2, 114.2, 114.2, 122.1];
 
   renderAeratedTable(
     page3,
     page3Weeks,
     765.2, // startY
-    73.7,  // endY
+    72.1,  // endY
     page3RowHeights,
     7.0,   // fontSizeDay
     6.7,   // fontSizeText
@@ -858,6 +857,21 @@ async function fillJournal() {
   const modifiedPdfBytes = await pdfDoc.save();
   fs.writeFileSync(outputPath, modifiedPdfBytes);
   console.log('SUCCESS: journal_stage_4_fr_rempli.pdf generated cleanly at:', outputPath);
+
+  // Generate "journal nada.pdf" containing exactly the first 3 pages
+  const doc3 = await PDFDocument.create();
+  const copiedPages = await doc3.copyPages(pdfDoc, [0, 1, 2]);
+  copiedPages.forEach((p) => doc3.addPage(p));
+  const doc3Bytes = await doc3.save();
+
+  const journalNadaPath = path.resolve(__dirname, '../../journal nada.pdf');
+  fs.writeFileSync(journalNadaPath, doc3Bytes);
+  console.log('SUCCESS: "journal nada.pdf" (3 pages) generated at:', journalNadaPath);
+
+  // Also save a 5-page version named "journal nada (5 pages complet).pdf"
+  const journalNada5Path = path.resolve(__dirname, '../../journal nada (5 pages complet).pdf');
+  fs.writeFileSync(journalNada5Path, modifiedPdfBytes);
+  console.log('SUCCESS: "journal nada (5 pages complet).pdf" generated at:', journalNada5Path);
 }
 
 fillJournal().catch(console.error);
